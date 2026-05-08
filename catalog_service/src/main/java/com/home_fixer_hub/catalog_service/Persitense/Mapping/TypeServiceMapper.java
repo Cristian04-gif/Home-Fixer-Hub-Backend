@@ -19,7 +19,7 @@ public interface TypeServiceMapper {
     TypeServiceDTO toDTO(TypeService typeService);
 
     @InheritInverseConfiguration
-    //@Mapping(target = "isNew", ignore = true)
+    @Mapping(target = "isNew", ignore = true)
     TypeService toEntity(TypeServiceDTO typeServiceDTO);
 
 }

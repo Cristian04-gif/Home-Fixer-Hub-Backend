@@ -1,0 +1,27 @@
+server:
+  port: 8081
+
+spring:
+  application:
+    name: identity_service # Este nombre aparecerá en el tablero de Eureka
+  r2dbc:
+    url: r2dbc:mysql://${DB_HOST:localhost}:${DB_PORT:3306}/${DB_NAME:home_fixer_hub}
+    username: ${DB_USERNAME:root}
+    password: ${DB_PASSWORD:root}
+    pool:
+      enabled: true
+      initial-size: 5
+      max-size: 10
+  # Configuración del servidor WebFlux
+  codec:
+    max-in-memory-size: 10MB
+  cloud:
+    config:
+      enabled: false
+  
+
+eureka:
+  client:
+    service-url:
+      defaultZone: http://${EUREKA_HOST:localhost}:${EUREKA_PORT:8761}/eureka/ # Aquí le avisa a Eureka que existe
+
