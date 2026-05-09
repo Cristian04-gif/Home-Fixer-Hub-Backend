@@ -1,9 +1,6 @@
-server:
-  port: 8081
-
 spring:
   application:
-    name: identity-service # Este nombre aparecerá en el tablero de Eureka
+    name: profile-service
   r2dbc:
     url: r2dbc:mysql://${DB_HOST:localhost}:${DB_PORT:3306}/${DB_NAME:home_fixer_hub}
     username: ${DB_USERNAME:root}
@@ -18,7 +15,6 @@ spring:
   cloud:
     config:
       enabled: false
-  
 
 eureka:
   client:

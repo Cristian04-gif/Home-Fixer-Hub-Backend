@@ -1,4 +1,4 @@
-package com.home_fixer_hub.identity_service.Domain.DTO.Register;
+package com.home_fixer_hub.identity_service.Domain.DTO.Request;
 
 import java.math.BigDecimal;
 

@@ -4,6 +4,9 @@ spring:
   application:
     name: eureka_server
 eureka:
+  server:
+    enable-self-preservation: false
+    eviction-interval-timer-in-ms: 5000
   instance:
     hostname: ${HOST_EUREKA:localhost}
   client:
