@@ -7,6 +7,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
+import com.home_fixer_hub.profile_service.Config.IdentityClient;
 import com.home_fixer_hub.profile_service.Domain.DTO.CustomerDTO;
 import com.home_fixer_hub.profile_service.Domain.DTO.Response.AllCustomerDTO;
 import com.home_fixer_hub.profile_service.Domain.Service.CustomerService;
@@ -23,6 +24,7 @@ public class CustomerServiceImp implements CustomerService {
 
     private final CustomerRepository customerRepository;
     private final CustomerMapper customerMapper;
+    private final IdentityClient identityClient;
 
     @Override
     public Mono<AllCustomerDTO> getAll(int page, int size) {
@@ -57,12 +59,23 @@ public class CustomerServiceImp implements CustomerService {
 
     @Override
     public Mono<CustomerDTO> register(CustomerDTO customerDTO) {
-        return Mono.fromCallable(() -> {
-            Customer customer = customerMapper.toEntity(customerDTO);
-            customer.setId(UUID.randomUUID().toString());
-            return customer;
-        }).flatMap(customerRepository::save).map(customerMapper::toDTO)
-                .switchIfEmpty(Mono.error(new RuntimeException("Error al registrar el cliente")));
+        return identityClient.isValidUser(customerDTO.userId()).flatMap(isValid -> {
+            if (isValid) {
+                Customer customer = customerMapper.toEntity(customerDTO);
+                customer.setId(UUID.randomUUID().toString());
+                return customerRepository.save(customer).map(customerMapper::toDTO);
+            }
+            return Mono.error(new RuntimeException("usuario de identidad no encontrado"));
+        });
+        /*
+         * return Mono.fromCallable(() -> {
+         * Customer customer = customerMapper.toEntity(customerDTO);
+         * customer.setId(UUID.randomUUID().toString());
+         * return customer;
+         * }).flatMap(customerRepository::save).map(customerMapper::toDTO)
+         * .switchIfEmpty(Mono.error(new
+         * RuntimeException("Error al registrar el cliente")));
+         */
     }
 
 }

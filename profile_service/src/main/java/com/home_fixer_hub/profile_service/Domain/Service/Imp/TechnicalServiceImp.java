@@ -7,6 +7,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
+import com.home_fixer_hub.profile_service.Config.IdentityClient;
 import com.home_fixer_hub.profile_service.Domain.DTO.TechnicalDTO;
 import com.home_fixer_hub.profile_service.Domain.DTO.Response.AllTechnicalDTO;
 import com.home_fixer_hub.profile_service.Domain.Service.TechnicalService;
@@ -23,6 +24,7 @@ public class TechnicalServiceImp implements TechnicalService {
 
     private final TechnicalRepository technicalRepository;
     private final TechnicalMapper technicalMapper;
+    private final IdentityClient identityClient;
 
     @Override
     public Mono<AllTechnicalDTO> getAll(int page, int size) {
@@ -58,13 +60,25 @@ public class TechnicalServiceImp implements TechnicalService {
 
     @Override
     public Mono<TechnicalDTO> register(TechnicalDTO technicalDTO) {
-        return Mono.fromCallable(() -> {
-            Technical technical = technicalMapper.toEntity(technicalDTO);
-            technical.setId(UUID.randomUUID().toString());
-            technical.setDisponible(true);
-            return technical;
-        }).flatMap(technicalRepository::save).map(technicalMapper::toDTO)
-                .switchIfEmpty(Mono.error(new RuntimeException("Error al registrar el tecnico")));
+        return identityClient.isValidUser(technicalDTO.userId()).flatMap(isValid -> {
+            if (isValid) {
+                Technical technical = technicalMapper.toEntity(technicalDTO);
+                technical.setId(UUID.randomUUID().toString());
+                technical.setDisponible(true);
+                return technicalRepository.save(technical).map(technicalMapper::toDTO);
+            }
+            return Mono.error(new RuntimeException("Usuario de identidad no encontrado"));
+        });
+        /*
+         * return Mono.fromCallable(() -> {
+         * Technical technical = technicalMapper.toEntity(technicalDTO);
+         * technical.setId(UUID.randomUUID().toString());
+         * technical.setDisponible(true);
+         * return technical;
+         * }).flatMap(technicalRepository::save).map(technicalMapper::toDTO)
+         * .switchIfEmpty(Mono.error(new
+         * RuntimeException("Error al registrar el tecnico")));
+         */
     }
 
 }

@@ -7,8 +7,10 @@ import org.springframework.stereotype.Repository;
 import com.home_fixer_hub.profile_service.Persistense.Model.Technical;
 
 import reactor.core.publisher.Flux;
+import reactor.core.publisher.Mono;
 
 @Repository
 public interface TechnicalRepository extends ReactiveCrudRepository<Technical, String> {
     Flux<Technical> findAllBy(Pageable pageable);
+    Mono<Technical> findbyIdUsuario(String idUsuario);
 }

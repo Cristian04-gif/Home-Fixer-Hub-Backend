@@ -12,5 +12,6 @@ public interface UserService {
     //public Mono<UserDTO> getById(String userId);
     public Mono<UserDTO> register(UserDTO userDTO);
     public Mono<String> login(AuthRequest authRequest);
+    public Mono<Boolean> validateUser(String userId);
     //public Mono<Void> delete(String userId);
 }

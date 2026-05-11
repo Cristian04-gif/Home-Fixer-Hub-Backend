@@ -16,9 +16,10 @@ import io.jsonwebtoken.security.Keys;
 public class JwtService {
     private static final String SECRET = "586E3272357538782F413F442847284862506553685668597033733676397924";
 
-    public String generateToken(String username, String role) {
+    public String generateToken(String username, String role, String userId) {
         Map<String, Object> claims = new HashMap<>();
         claims.put("role", role); // Agregamos el rol (ej. "ROLE_CLIENT" o "ROLE_TECHNICAL")
+        claims.put("userId", userId);
         return createToken(claims, username);
     }
 

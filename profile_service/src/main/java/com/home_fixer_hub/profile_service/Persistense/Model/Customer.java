@@ -21,7 +21,7 @@ public class Customer implements Persistable<String> {
     private String nombre;
     private String apellido;
     private String dni;
-    private String id_usuario; 
+    private String idUsuario; 
 
     @Transient
     @Builder.Default

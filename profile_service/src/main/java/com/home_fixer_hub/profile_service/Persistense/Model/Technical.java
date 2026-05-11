@@ -23,7 +23,7 @@ public class Technical implements Persistable<String> {
     private String dni;
     private Double tarifa_visita;
     private Boolean disponible;
-    private String id_usuario;
+    private String idUsuario;
 
     @Transient
     @Builder.Default

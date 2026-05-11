@@ -84,8 +84,13 @@ public class UserServiceImp implements UserService {
     public Mono<String> login(AuthRequest request) {
         return userRepository.findByEmail(request.email())
                 .filter(user -> passwordEncoder.matches(request.password(), user.getContrasena()))
-                .map(user -> jwtService.generateToken(user.getEmail(), user.getRol()))
+                .map(user -> jwtService.generateToken(user.getEmail(), user.getRol(), user.getId()))
                 .switchIfEmpty(Mono.error(new RuntimeException("Credenciales inválidas")));
+    }
+
+    @Override
+    public Mono<Boolean> validateUser(String userId) {
+        return userRepository.existsById(userId);
     }
 
     /*

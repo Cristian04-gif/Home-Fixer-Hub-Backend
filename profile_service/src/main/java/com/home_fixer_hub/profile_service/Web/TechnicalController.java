@@ -1,0 +1,56 @@
+package com.home_fixer_hub.profile_service.Web;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
+
+import com.home_fixer_hub.profile_service.Domain.DTO.TechnicalDTO;
+import com.home_fixer_hub.profile_service.Domain.DTO.Response.AllTechnicalDTO;
+import com.home_fixer_hub.profile_service.Domain.Service.TechnicalService;
+import com.home_fixer_hub.profile_service.Persistense.Util.Pagination;
+
+import lombok.extern.log4j.Log4j2;
+import reactor.core.publisher.Mono;
+
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+
+@RestController
+@Log4j2
+@RequestMapping("/profile/technicals")
+public class TechnicalController {
+
+    @Autowired
+    private TechnicalService technicalService;
+
+    @GetMapping("")
+    public Mono<ResponseEntity<AllTechnicalDTO>> getAll(
+            @RequestParam(defaultValue = Pagination.PAGE_NUMBER, required = false) int pageNumber,
+            @RequestParam(defaultValue = Pagination.PAGE_SIZE, required = false) int pageSize) {
+        return technicalService.getAll(pageNumber, pageSize).map(value -> ResponseEntity.ok().body(value));
+    }
+
+    @GetMapping("/{technicalId}")
+    public Mono<ResponseEntity<TechnicalDTO>> getById(@PathVariable String technicalId) {
+        return technicalService.getbyId(technicalId).map(value -> ResponseEntity.ok(value)).onErrorResume(e -> {
+            log.error("No se encontro el tecnico con el ID, {}", technicalId, e);
+            return Mono.just(ResponseEntity.notFound().build());
+        });
+    }
+
+    @PostMapping("")
+    public Mono<ResponseEntity<TechnicalDTO>> register(@RequestBody TechnicalDTO technicalDTO) {
+        return technicalService.register(technicalDTO)
+                .map(value -> ResponseEntity.status(HttpStatus.CREATED).body(value)).onErrorResume(e -> {
+                    log.error("no se pudo registrar el tecnico, {}", e);
+                    return Mono.just(ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build());
+                });
+
+    }
+
+}

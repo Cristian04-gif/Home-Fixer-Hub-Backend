@@ -21,3 +21,6 @@ eureka:
     service-url:
       defaultZone: http://${EUREKA_HOST:localhost}:${EUREKA_PORT:8761}/eureka/ # Aquí le avisa a Eureka que existe
 
+services:
+  identity-service:
+    url: http://IDENTITY-SERVICE

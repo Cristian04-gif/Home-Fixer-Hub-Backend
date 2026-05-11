@@ -18,6 +18,7 @@ import lombok.extern.log4j.Log4j2;
 import reactor.core.publisher.Mono;
 
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 
@@ -38,14 +39,17 @@ public class UserController {
         return userService.getAll(page, size).map(value -> ResponseEntity.ok().body(value));
     }
 
-   /*  @GetMapping("/{userId}")
-    public Mono<ResponseEntity<UserDTO>> getById(@PathVariable String userId) {
-        return userService.getById(userId).map(value -> ResponseEntity.ok(value)).onErrorResume(e -> {
-            log.error("NO se encontro el usuario con ID: {}", userId, e);
-            return Mono.just(ResponseEntity.notFound().build());
-        });
-
-    }*/
+    /*
+     * @GetMapping("/{userId}")
+     * public Mono<ResponseEntity<UserDTO>> getById(@PathVariable String userId) {
+     * return userService.getById(userId).map(value ->
+     * ResponseEntity.ok(value)).onErrorResume(e -> {
+     * log.error("NO se encontro el usuario con ID: {}", userId, e);
+     * return Mono.just(ResponseEntity.notFound().build());
+     * });
+     * 
+     * }
+     */
 
     @PostMapping("/register")
     public Mono<ResponseEntity<UserDTO>> register(@RequestBody UserDTO userDTO) {
@@ -64,6 +68,13 @@ public class UserController {
                     log.error("No se pudo iniciar sesion con el usuario {}", e);
                     return Mono.just(ResponseEntity.status(HttpStatus.UNAUTHORIZED).build());
                 });
+    }
+
+    @GetMapping("/validate/{userId}")
+    public Mono<ResponseEntity<Void>> validateUser(@PathVariable String userId) {
+        return userService.validateUser(userId)
+                .map(user -> ResponseEntity.ok().<Void>build())
+                .switchIfEmpty(Mono.just(ResponseEntity.notFound().build()));
     }
 
 }
