@@ -20,18 +20,18 @@ import org.springframework.web.bind.annotation.RequestBody;
 
 @RestController
 @Log4j2
-@RequestMapping("/api/typeService")
+@RequestMapping("/api/catalog")
 public class TypeServiceController {
 
     @Autowired
     private TypeServiceService typeServiceService;
 
-    @GetMapping("")
+    @GetMapping("/public/services")
     public ResponseEntity<Flux<TypeServiceDTO>> getAll() {
         return new ResponseEntity<>(typeServiceService.getAll(), HttpStatus.OK);
     }
 
-    @GetMapping("/{typeServiceId}")
+    @GetMapping("/public/services/{typeServiceId}")
     public Mono<ResponseEntity<TypeServiceDTO>> getById(@PathVariable String typeServiceId) {
         return typeServiceService.getById(typeServiceId).map(value -> ResponseEntity.ok().body(value))
                 .onErrorResume(e -> {
@@ -40,7 +40,7 @@ public class TypeServiceController {
                 });
     }
 
-    @PostMapping("")
+    @PostMapping("/admin/services")
     public Mono<ResponseEntity<TypeServiceDTO>> register(@RequestBody TypeServiceDTO typeServiceDTO) {
         return typeServiceService.register(typeServiceDTO)
                 .map(value -> ResponseEntity.status(HttpStatus.CREATED).body(value))

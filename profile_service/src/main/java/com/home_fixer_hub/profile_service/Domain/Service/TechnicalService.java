@@ -12,4 +12,5 @@ public interface TechnicalService {
     public Mono<TechnicalDTO> getbyId(String technicalid);
 
     public Mono<TechnicalDTO> register(TechnicalDTO technicalDTO);
+
 }

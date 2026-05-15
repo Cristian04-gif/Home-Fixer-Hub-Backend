@@ -1,4 +1,4 @@
-package com.home_fixer_hub.profile_service.Domain.DTO;
+package com.home_fixer_hub.catalog_service.Domain.DTO;
 
 import java.math.BigDecimal;
 

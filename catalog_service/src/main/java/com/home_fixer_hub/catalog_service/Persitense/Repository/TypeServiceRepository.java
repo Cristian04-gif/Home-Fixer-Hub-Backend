@@ -5,7 +5,9 @@ import org.springframework.stereotype.Repository;
 
 import com.home_fixer_hub.catalog_service.Persitense.Model.TypeService;
 
+import reactor.core.publisher.Mono;
+
 @Repository
 public interface TypeServiceRepository extends ReactiveCrudRepository<TypeService, String> {
-
+    Mono<TypeService> findByNombre(String nombre);
 }

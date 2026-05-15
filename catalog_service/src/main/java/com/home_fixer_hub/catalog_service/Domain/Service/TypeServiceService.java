@@ -12,4 +12,5 @@ public interface TypeServiceService {
     public Mono<TypeServiceDTO> getById(String id);
 
     public Mono<TypeServiceDTO> register(TypeServiceDTO typeServiceDTO);
+
 }

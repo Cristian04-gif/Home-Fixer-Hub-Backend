@@ -22,7 +22,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 
 @RestController
 @Log4j2
-@RequestMapping("/profile/technicals")
+@RequestMapping("/api/profile/technicals")
 public class TechnicalController {
 
     @Autowired

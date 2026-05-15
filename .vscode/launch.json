@@ -51,6 +51,16 @@
             "projectName": "api_gateway",
             "args": "",
             "envFile": "${workspaceFolder}/.env"
+        },
+        {
+            "type": "java",
+            "name": "Spring Boot-ProfileServiceApplication<profile_service>",
+            "request": "launch",
+            "cwd": "${workspaceFolder}",
+            "mainClass": "com.home_fixer_hub.profile_service.ProfileServiceApplication",
+            "projectName": "profile_service",
+            "args": "",
+            "envFile": "${workspaceFolder}/.env"
         }
     ]
 }

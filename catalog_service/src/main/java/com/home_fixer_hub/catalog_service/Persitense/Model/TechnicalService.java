@@ -1,6 +1,4 @@
-package com.home_fixer_hub.profile_service.Persistense.Model;
-
-import java.math.BigDecimal;
+package com.home_fixer_hub.catalog_service.Persitense.Model;
 
 import org.springframework.data.annotation.Id;
 import org.springframework.data.annotation.Transient;
@@ -12,22 +10,19 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-@Table("tecnicos")
+@Table("tecnico_servicio")
 @Data
 @NoArgsConstructor
 @Builder
 @AllArgsConstructor
-public class Technical implements Persistable<String> {
+public class TechnicalService implements Persistable<String>{
     @Id
     private String id;
-    private String nombre;
-    private String apellido;
-    private String dni;
-    private BigDecimal tarifa_visita;
-    private Boolean disponible;
-    private String idUsuario;
+    private String idTecnico;
+    private String idServicio;
 
     @Transient
     @Builder.Default
     private boolean isNew = true;
+
 }

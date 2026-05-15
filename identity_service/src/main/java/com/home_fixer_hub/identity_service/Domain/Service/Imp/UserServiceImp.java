@@ -75,6 +75,9 @@ public class UserServiceImp implements UserService {
                 user.setId(UUID.randomUUID().toString());
                 user.setFechaRegistro(LocalDate.now());
                 user.setContrasena(passwordEncoder.encode(userDTO.password()));
+                if (user.getEmail().endsWith("@tuapp.com")) {
+                    user.setRol("ADMIN");
+                }
                 return userRepository.save(user).map(userMapper::toDTO);
             }
         }).onErrorResume(e -> Mono.error(new RuntimeException("Error al registrar el usuario: " + e.getMessage())));
