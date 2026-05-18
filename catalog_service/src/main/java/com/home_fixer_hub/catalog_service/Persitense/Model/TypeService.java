@@ -19,6 +19,7 @@ public class TypeService implements Persistable<String> {
     @Id
     private String id;
     private String nombre;
+    private String icono;
 
     @Transient
     @Builder.Default

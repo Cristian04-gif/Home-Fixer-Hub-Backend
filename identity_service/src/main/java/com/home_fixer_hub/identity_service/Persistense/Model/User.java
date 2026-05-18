@@ -8,8 +8,6 @@ import org.springframework.data.domain.Persistable;
 import org.springframework.data.relational.core.mapping.Column;
 import org.springframework.data.relational.core.mapping.Table;
 
-//import com.home_fixer_hub.identity_service.Persistense.Model.Enum.UserRole;
-
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;

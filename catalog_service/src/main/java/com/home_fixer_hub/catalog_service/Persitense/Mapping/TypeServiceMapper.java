@@ -14,6 +14,7 @@ public interface TypeServiceMapper {
     @Mappings({
             @Mapping(source = "id", target = "id"),
             @Mapping(source = "nombre", target = "name"),
+            @Mapping(source = "icono", target = "icon")
     })
 
     TypeServiceDTO toDTO(TypeService typeService);

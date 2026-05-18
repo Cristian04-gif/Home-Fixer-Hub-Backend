@@ -4,7 +4,7 @@ spring:
   application:
     name: profile-service
   r2dbc:
-    url: r2dbc:mysql://${DB_HOST:localhost}:${DB_PORT:3306}/${DB_NAME:home_fixer_hub}
+    url: r2dbc:mysql://${DB_HOST:localhost}:${DB_PORT:3306}/${DB_NAME:ms_profile}
     username: ${DB_USERNAME:root}
     password: ${DB_PASSWORD:root}
     pool:
