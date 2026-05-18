@@ -19,8 +19,6 @@ import com.home_fixer_hub.catalog_service.Persitense.Repository.TechnicalService
 import com.home_fixer_hub.catalog_service.Persitense.Repository.TypeServiceRepository;
 
 import lombok.RequiredArgsConstructor;
-import lombok.extern.java.Log;
-import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 @Service
@@ -49,8 +47,10 @@ public class TechnicalServiceServiceImp implements TechnicalServiceService {
 
     @Override
     public Mono<AllTechnicalDTO> getTechnicalsByService(String serviceId, int pageNumber, int pageSize) {
+
         Mono<TypeServiceDTO> service = serviceRepository.findById(serviceId).map(serviceMapper::toDTO)
                 .switchIfEmpty(Mono.error(new RuntimeException("No se encontro el servicio")));
+
         Mono<List<TechnicalDTO>> technicals = repository
                 .findAllByIdServicio(serviceId, PageRequest.of(pageNumber, pageSize))
                 .flatMap(value -> profileClient.getTechnicalById(value.getIdTecnico())).collectList();
@@ -73,6 +73,13 @@ public class TechnicalServiceServiceImp implements TechnicalServiceService {
                     .last(last)
                     .build();
         });
+    }
+
+    @Override
+    public Mono<Void> deleteByTechnical(String technicalId) {
+        return profileClient.getTechnicalById(technicalId)
+                .flatMap(technical -> repository.deleteAllByIdTecnico(technicalId))
+                .switchIfEmpty(Mono.error(new RuntimeException("No se encontro el tecnico con id: " + technicalId)));
     }
 
 }

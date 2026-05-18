@@ -14,11 +14,13 @@ import com.home_fixer_hub.profile_service.Persistense.Util.Pagination;
 import lombok.extern.log4j.Log4j2;
 import reactor.core.publisher.Mono;
 
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.PutMapping;
 
 @RestController
 @Log4j2
@@ -43,7 +45,7 @@ public class TechnicalController {
         });
     }
 
-    @PostMapping("")
+    @PostMapping("/fixer")
     public Mono<ResponseEntity<TechnicalDTO>> register(@RequestBody TechnicalDTO technicalDTO) {
         return technicalService.register(technicalDTO)
                 .map(value -> ResponseEntity.status(HttpStatus.CREATED).body(value)).onErrorResume(e -> {
@@ -51,6 +53,20 @@ public class TechnicalController {
                     return Mono.just(ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build());
                 });
 
+    }
+
+    @PutMapping("/fixer/{technicalId}")
+    public Mono<ResponseEntity<TechnicalDTO>> update(@PathVariable String technicalId, TechnicalDTO dto) {
+        return technicalService.update(technicalId, dto)
+                .map(value -> ResponseEntity.status(HttpStatus.ACCEPTED).body(value)).onErrorResume(e -> {
+                    log.error("No se puedo actualizar el tecnico ", e);
+                    return Mono.just(ResponseEntity.status(HttpStatus.BAD_REQUEST).build());
+                });
+    }
+
+    @DeleteMapping("/fixer/{technicalId}")
+    public Mono<ResponseEntity<Void>> deleteById(@PathVariable String technicalId) {
+        return technicalService.deleteById(technicalId).map(vales -> ResponseEntity.noContent().build());
     }
 
 }

@@ -7,6 +7,9 @@ import reactor.core.publisher.Mono;
 
 public interface TechnicalServiceService {
     public Mono<TechnicalServiceDTO> assignSkill(String technicalId, String serviceId);
+
     public Mono<AllTechnicalDTO> getTechnicalsByService(String serviceId, int pageNumber, int pageSize);
+
+    public Mono<Void> deleteByTechnical(String technicalId);
 
 }

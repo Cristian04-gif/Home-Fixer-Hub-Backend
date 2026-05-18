@@ -7,7 +7,8 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
-import com.home_fixer_hub.profile_service.Config.IdentityClient;
+import com.home_fixer_hub.profile_service.Domain.Client.CatalogClient;
+import com.home_fixer_hub.profile_service.Domain.Client.IdentityClient;
 import com.home_fixer_hub.profile_service.Domain.DTO.TechnicalDTO;
 import com.home_fixer_hub.profile_service.Domain.DTO.Response.AllTechnicalDTO;
 import com.home_fixer_hub.profile_service.Domain.Service.TechnicalService;
@@ -25,6 +26,7 @@ public class TechnicalServiceImp implements TechnicalService {
     private final TechnicalRepository technicalRepository;
     private final TechnicalMapper technicalMapper;
     private final IdentityClient identityClient;
+    private final CatalogClient catalogClient;
 
     @Override
     public Mono<AllTechnicalDTO> getAll(int page, int size) {
@@ -69,16 +71,28 @@ public class TechnicalServiceImp implements TechnicalService {
             }
             return Mono.error(new RuntimeException("Usuario de identidad no encontrado"));
         });
-        /*
-         * return Mono.fromCallable(() -> {
-         * Technical technical = technicalMapper.toEntity(technicalDTO);
-         * technical.setId(UUID.randomUUID().toString());
-         * technical.setDisponible(true);
-         * return technical;
-         * }).flatMap(technicalRepository::save).map(technicalMapper::toDTO)
-         * .switchIfEmpty(Mono.error(new
-         * RuntimeException("Error al registrar el tecnico")));
-         */
+
+    }
+
+    @Override
+    public Mono<TechnicalDTO> update(String technicalId, TechnicalDTO technicalDTO) {
+        return technicalRepository.findById(technicalId).flatMap(technical -> {
+            technical.setNombre(technicalDTO.name());
+            technical.setApellido(technicalDTO.lastName());
+            technical.setDni(technicalDTO.dni());
+            technical.setTarifa_visita(technicalDTO.visitFee());
+            return technicalRepository.save(technical).map(technicalMapper::toDTO);
+        }).switchIfEmpty(Mono.error(new RuntimeException("No se encontro el tecnico mediante el id: " + technicalId)));
+    }
+
+    @Override
+    public Mono<Void> deleteById(String technicalId) {
+        return technicalRepository.findById(technicalId)
+                .flatMap(value -> {
+                    catalogClient.deleteRelatedServices(value.getId());
+                    return technicalRepository.delete(value);
+                })
+                .switchIfEmpty(Mono.error(new RuntimeException("No se encontor el tecnico con el id: " + technicalId)));
     }
 
 }

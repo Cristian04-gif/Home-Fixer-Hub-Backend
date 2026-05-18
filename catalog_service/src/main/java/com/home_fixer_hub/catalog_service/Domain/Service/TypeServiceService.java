@@ -13,4 +13,8 @@ public interface TypeServiceService {
 
     public Mono<TypeServiceDTO> register(TypeServiceDTO typeServiceDTO);
 
+    public Mono<TypeServiceDTO> update(String serviceId, TypeServiceDTO serviceDTO);
+
+    public Mono<Void> deleteById(String serviceId);
+
 }

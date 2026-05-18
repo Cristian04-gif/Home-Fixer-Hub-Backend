@@ -28,4 +28,17 @@ public class ProfileClient {
                 .bodyToMono(TechnicalDTO.class);
 
     }
+
+    ///no se si her este metodo
+    public Mono<Boolean> deleteTechnicalById(String technicalid) {
+        return webClient.delete()
+                .uri("/api/profile/technicals/fixer/{technicalId}", technicalid)
+                .retrieve()
+                .toBodilessEntity()
+                .map(response -> response.getStatusCode().is2xxSuccessful())
+                .onErrorResume(e -> {
+                    System.out.println("Error en validación: " + e.getMessage());
+                    return Mono.just(false);
+                });
+    }
 }

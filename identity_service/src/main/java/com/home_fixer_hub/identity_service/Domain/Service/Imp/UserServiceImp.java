@@ -11,6 +11,7 @@ import org.springframework.stereotype.Service;
 
 import com.home_fixer_hub.identity_service.Domain.DTO.UserDTO;
 import com.home_fixer_hub.identity_service.Domain.DTO.Request.AuthRequest;
+import com.home_fixer_hub.identity_service.Domain.DTO.Response.AuthResponse;
 import com.home_fixer_hub.identity_service.Domain.DTO.Response.UserResponse;
 import com.home_fixer_hub.identity_service.Domain.Service.JwtService;
 import com.home_fixer_hub.identity_service.Domain.Service.UserService;
@@ -56,17 +57,8 @@ public class UserServiceImp implements UserService {
 
     }
 
-    /*
-     * @Override
-     * public Mono<UserDTO> getById(String userId) {
-     * return userRepository.findById(userId).map(userMapper::toDTO)
-     * .switchIfEmpty(Mono.error(new
-     * RuntimeException("No se encontro el usuarios")));
-     * }
-     */
-
     @Override
-    public Mono<UserDTO> register(UserDTO userDTO) {
+    public Mono<AuthResponse> register(UserDTO userDTO) {
         return userRepository.existsByEmail(userDTO.email()).flatMap(exists -> {
             if (exists) {
                 return Mono.error(new RuntimeException("El email ya esta registrado"));
@@ -80,14 +72,21 @@ public class UserServiceImp implements UserService {
                 }
                 return userRepository.save(user).map(userMapper::toDTO);
             }
+        }).map(user -> {
+            String token = jwtService.generateToken(user.email(), user.role(), user.id());
+            return new AuthResponse(user.id(), token);
         }).onErrorResume(e -> Mono.error(new RuntimeException("Error al registrar el usuario: " + e.getMessage())));
     }
 
     @Override
-    public Mono<String> login(AuthRequest request) {
+    public Mono<AuthResponse> login(AuthRequest request) {
         return userRepository.findByEmail(request.email())
                 .filter(user -> passwordEncoder.matches(request.password(), user.getContrasena()))
-                .map(user -> jwtService.generateToken(user.getEmail(), user.getRol(), user.getId()))
+                .map(user -> {
+                    String userId = user.getId();
+                    String token = jwtService.generateToken(user.getEmail(), user.getRol(), user.getId());
+                    return new AuthResponse(userId, token);
+                })
                 .switchIfEmpty(Mono.error(new RuntimeException("Credenciales inválidas")));
     }
 
@@ -95,14 +94,5 @@ public class UserServiceImp implements UserService {
     public Mono<Boolean> validateUser(String userId) {
         return userRepository.existsById(userId);
     }
-
-    /*
-     * @Override
-     * public Mono<Void> delete(String userId) {
-     * return userRepository.findById(userId).flatMap(userRepository::delete)
-     * .switchIfEmpty(Mono.error(new
-     * RuntimeException("No se encontro el usuario a eliminar")));
-     * }
-     */
 
 }

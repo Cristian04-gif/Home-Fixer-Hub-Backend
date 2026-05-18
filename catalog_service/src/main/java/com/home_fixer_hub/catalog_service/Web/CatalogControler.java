@@ -12,6 +12,7 @@ import com.home_fixer_hub.catalog_service.Persitense.Utils.Pagination;
 import lombok.extern.log4j.Log4j2;
 import reactor.core.publisher.Mono;
 
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -33,6 +34,12 @@ public class CatalogControler {
                     log.error("ocurrio un error al buscar los tecnicos del servicio {}", e);
                     return Mono.just(ResponseEntity.notFound().build());
                 });
+    }
+
+    @DeleteMapping("/fixer/remove-related-services/{technicalId}")
+    public Mono<ResponseEntity<Void>> deleteRelatedServices(@PathVariable String technicalId) {
+        return service.deleteByTechnical(technicalId).map(value -> ResponseEntity.noContent().build());
+
     }
 
 }

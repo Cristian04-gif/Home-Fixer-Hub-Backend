@@ -13,4 +13,8 @@ public interface TechnicalService {
 
     public Mono<TechnicalDTO> register(TechnicalDTO technicalDTO);
 
+    public Mono<TechnicalDTO> update(String technicalId, TechnicalDTO technicalDTO);
+
+    public Mono<Void> deleteById(String technicalId);
+
 }

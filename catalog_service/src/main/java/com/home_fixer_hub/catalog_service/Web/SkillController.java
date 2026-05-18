@@ -23,7 +23,7 @@ public class SkillController {
     @Autowired
     private TechnicalServiceService service;
 
-    @PostMapping("/assing")
+    @PostMapping("/assing/fixer")
     public Mono<ResponseEntity<TechnicalServiceDTO>> assignServiceToTechnician(@RequestBody TechnicalServiceDTO dto) {
         return service.assignSkill(dto.technicalId(), dto.serviceId())
                 .map(value -> ResponseEntity.status(HttpStatus.CREATED).body(value)).onErrorResume(e -> {

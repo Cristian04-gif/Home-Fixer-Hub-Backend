@@ -14,5 +14,10 @@ public interface TechnicalServiceRepository extends ReactiveCrudRepository<Techn
     Flux<TechnicalService> findAllByIdTecnico(String idTecnico);
 
     Flux<TechnicalService> findAllByIdServicio(String idServicio, Pageable pageable);
+
     Mono<Long> countByIdServicio(String idServicio);
+
+    Mono<Void> deleteAllByIdServicio(String idService);
+
+    Mono<Void> deleteAllByIdTecnico(String idTecnico);
 }

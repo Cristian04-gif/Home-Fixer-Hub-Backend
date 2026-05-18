@@ -1,4 +1,4 @@
-package com.home_fixer_hub.profile_service.Config;
+package com.home_fixer_hub.profile_service.Domain.Client;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
@@ -11,11 +11,10 @@ public class IdentityClient {
 
     private final WebClient webClient;
 
-    // Inyectamos el valor directamente en el parámetro del constructor
     public IdentityClient(WebClient.Builder webClientBuilder, 
                           @Value("${services.identity-service.url}") String identityServiceUrl) {
         this.webClient = webClientBuilder
-                .baseUrl(identityServiceUrl) // Ahora sí tiene valor: http://IDENTITY-SERVICE
+                .baseUrl(identityServiceUrl) 
                 .build();
     }
 

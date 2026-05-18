@@ -30,7 +30,7 @@ public class UserController {
     @Autowired
     private UserService userService;
 
-    @GetMapping("/all")
+    @GetMapping("/admin/all-users")
     public Mono<ResponseEntity<UserResponse>> getAll(
 
             @RequestParam(defaultValue = Pagination.PAGE_NUMBER, required = false) int page,
@@ -52,7 +52,7 @@ public class UserController {
      */
 
     @PostMapping("/register")
-    public Mono<ResponseEntity<UserDTO>> register(@RequestBody UserDTO userDTO) {
+    public Mono<ResponseEntity<AuthResponse>> register(@RequestBody UserDTO userDTO) {
         return userService.register(userDTO).map(value -> ResponseEntity.status(201).body(value))
                 .onErrorResume(e -> {
                     log.error("No se pudo registrar el usuario {}", e);
@@ -61,9 +61,9 @@ public class UserController {
     }
 
     @PostMapping("/login")
-    public Mono<ResponseEntity<AuthResponse>> getToken(@RequestBody AuthRequest authRequest) {
+    public Mono<ResponseEntity<AuthResponse>> login(@RequestBody AuthRequest authRequest) {
         return userService.login(authRequest)
-                .map(token -> ResponseEntity.ok(new AuthResponse(token)))
+                .map(login -> ResponseEntity.ok(new AuthResponse(login.getUserId(), login.getToken())))
                 .onErrorResume(e -> {
                     log.error("No se pudo iniciar sesion con el usuario {}", e);
                     return Mono.just(ResponseEntity.status(HttpStatus.UNAUTHORIZED).build());

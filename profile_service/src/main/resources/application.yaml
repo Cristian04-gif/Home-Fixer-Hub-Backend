@@ -26,3 +26,5 @@ eureka:
 services:
   identity-service:
     url: http://IDENTITY-SERVICE
+  catalog-service:
+    uri: http://CATALOG-SERVICE

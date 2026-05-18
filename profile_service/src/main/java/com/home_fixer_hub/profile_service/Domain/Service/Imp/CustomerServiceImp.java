@@ -7,7 +7,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
-import com.home_fixer_hub.profile_service.Config.IdentityClient;
+import com.home_fixer_hub.profile_service.Domain.Client.IdentityClient;
 import com.home_fixer_hub.profile_service.Domain.DTO.CustomerDTO;
 import com.home_fixer_hub.profile_service.Domain.DTO.Response.AllCustomerDTO;
 import com.home_fixer_hub.profile_service.Domain.Service.CustomerService;

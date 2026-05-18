@@ -52,6 +52,10 @@ public class AuthenticationFilter extends AbstractGatewayFilterFactory<Authentic
                         throw new RuntimeException("Solo los técnicos pueden acceder aquí");
                     }
 
+                    if (path.contains("/customer/") && !role.equals("CLIENTE")) {
+                        throw new RuntimeException("Solo los clientes pueden acceder aquí");
+                    }
+
                     exchange.getRequest().mutate()
                             .header("loggedInUser", username) // Esta cabecera llegará al microservicio destino
                             .header("role", role)

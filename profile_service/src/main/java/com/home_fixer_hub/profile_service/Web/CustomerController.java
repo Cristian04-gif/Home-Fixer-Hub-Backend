@@ -44,8 +44,9 @@ public class CustomerController {
         });
     }
 
-    @PostMapping("")
-    public Mono<ResponseEntity<CustomerDTO>> register(@RequestBody CustomerDTO customerDTO) {
+    @PostMapping("/customer")
+    public Mono<ResponseEntity<CustomerDTO>> register(@RequestHeader("Authorization") String auth, @RequestBody CustomerDTO customerDTO) {
+        System.out.println(auth);
         return customerService.register(customerDTO)
                 .map(value -> ResponseEntity.status(HttpStatus.CREATED).body(value)).onErrorResume(e -> {
                     log.error("no se pudo registrar el cliente, {}", e);
