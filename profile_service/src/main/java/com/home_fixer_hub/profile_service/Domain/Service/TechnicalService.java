@@ -9,6 +9,8 @@ public interface TechnicalService {
 
     public Mono<AllTechnicalDTO> getAll(int page, int size);
 
+    public Mono<AllTechnicalDTO> getAllAvailable(int pageNumber, int pageSize);
+
     public Mono<TechnicalDTO> getbyId(String technicalid);
 
     public Mono<TechnicalDTO> register(TechnicalDTO technicalDTO);

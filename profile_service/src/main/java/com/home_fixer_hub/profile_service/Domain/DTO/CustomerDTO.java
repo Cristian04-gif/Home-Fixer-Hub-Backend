@@ -5,7 +5,8 @@ public record CustomerDTO(
     String name,
     String lastName,
     String dni,
-    String userId
+    String userId,
+    String urlPhotoProfile
 ) {
 
 }

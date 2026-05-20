@@ -9,6 +9,7 @@ import org.springframework.web.bind.annotation.RestController;
 import com.home_fixer_hub.catalog_service.Domain.DTO.TypeServiceDTO;
 import com.home_fixer_hub.catalog_service.Domain.Service.TypeServiceService;
 
+import jakarta.ws.rs.HeaderParam;
 import lombok.extern.log4j.Log4j2;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
@@ -18,6 +19,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.PutMapping;
 
 @RestController
@@ -43,7 +45,8 @@ public class TypeServiceController {
     }
 
     @PostMapping("/admin/service")
-    public Mono<ResponseEntity<TypeServiceDTO>> register(@RequestBody TypeServiceDTO typeServiceDTO) {
+    public Mono<ResponseEntity<TypeServiceDTO>> register(@RequestHeader("Authorization") String auth,@RequestBody TypeServiceDTO typeServiceDTO) {
+        System.out.println(auth);
         return typeServiceService.register(typeServiceDTO)
                 .map(value -> ResponseEntity.status(HttpStatus.CREATED).body(value))
                 .onErrorResume(e -> {

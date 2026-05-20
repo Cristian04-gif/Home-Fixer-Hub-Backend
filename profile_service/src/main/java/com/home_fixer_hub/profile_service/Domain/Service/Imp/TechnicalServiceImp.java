@@ -95,4 +95,30 @@ public class TechnicalServiceImp implements TechnicalService {
                 .switchIfEmpty(Mono.error(new RuntimeException("No se encontor el tecnico con el id: " + technicalId)));
     }
 
+    @Override
+    public Mono<AllTechnicalDTO> getAllAvailable(int pageNumber, int pageSize) {
+        
+        Mono<List<TechnicalDTO>> technicals = technicalRepository
+                .findAllByDisponibleTrue(PageRequest.of(pageNumber, pageSize, Sort.by("id").ascending()))
+                .map(technicalMapper::toDTO)
+                .collectList();
+
+        Mono<Long> count = technicalRepository.count();
+
+        return Mono.zip(technicals, count).map(tuple -> {
+            List<TechnicalDTO> list = tuple.getT1();
+            long totalElements = tuple.getT2();
+            int totalPages = (int) Math.ceil((double) totalElements / pageSize);
+            boolean last = pageNumber >= totalPages - 1;
+            return AllTechnicalDTO.builder()
+                    .technicalDTOs(list)
+                    .pageNumber(pageNumber)
+                    .pageSize(totalElements > 0 ? pageSize : 0)
+                    .totalElements(totalElements)
+                    .totalPages(totalPages)
+                    .last(last)
+                    .build();
+        });
+    }
+
 }

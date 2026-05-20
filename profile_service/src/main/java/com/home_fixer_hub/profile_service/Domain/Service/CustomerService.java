@@ -10,4 +10,5 @@ public interface CustomerService {
     public Mono<AllCustomerDTO> getAll(int page, int size);
     public Mono<CustomerDTO> getById(String customerId);
     public Mono<CustomerDTO> register(CustomerDTO customerDTO);
+    public Mono<CustomerDTO> getByUserId(String userId);
 }

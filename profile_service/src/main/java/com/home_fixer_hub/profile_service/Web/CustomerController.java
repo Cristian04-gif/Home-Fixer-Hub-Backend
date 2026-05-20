@@ -44,8 +44,17 @@ public class CustomerController {
         });
     }
 
+    @GetMapping("/customer/userId/{userId}")
+    public Mono<ResponseEntity<CustomerDTO>> getByUserId(@PathVariable String userId){
+        return customerService.getByUserId(userId).map(value -> ResponseEntity.ok(value)).onErrorResume(e ->{
+            log.error("No se encontro el user id, {}", e);
+            return Mono.just(ResponseEntity.notFound().build());
+        });
+    }
+
     @PostMapping("/customer")
-    public Mono<ResponseEntity<CustomerDTO>> register(@RequestHeader("Authorization") String auth, @RequestBody CustomerDTO customerDTO) {
+    public Mono<ResponseEntity<CustomerDTO>> register(@RequestHeader("Authorization") String auth,
+            @RequestBody CustomerDTO customerDTO) {
         System.out.println(auth);
         return customerService.register(customerDTO)
                 .map(value -> ResponseEntity.status(HttpStatus.CREATED).body(value)).onErrorResume(e -> {

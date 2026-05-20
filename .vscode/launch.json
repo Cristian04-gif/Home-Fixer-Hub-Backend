@@ -40,7 +40,8 @@
             "mainClass": "com.home_fixer_hub.catalog_service.CatalogServiceApplication",
             "projectName": "catalog_service",
             "args": "",
-            "envFile": "${workspaceFolder}/.env"
+            "envFile": "${workspaceFolder}/.env",
+            "vmArgs": " -Dcom.sun.management.jmxremote -Dcom.sun.management.jmxremote.port=64910 -Dcom.sun.management.jmxremote.authenticate=false -Dcom.sun.management.jmxremote.ssl=false -Dspring.jmx.enabled=true -Djava.rmi.server.hostname=localhost -Dspring.application.admin.enabled=true -Dspring.boot.project.name=catalog_service"
         },
         {
             "type": "java",
@@ -50,7 +51,8 @@
             "mainClass": "com.home_fixer_hub.api_gateway.ApiGatewayApplication",
             "projectName": "api_gateway",
             "args": "",
-            "envFile": "${workspaceFolder}/.env"
+            "envFile": "${workspaceFolder}/.env",
+            "vmArgs": " -Dcom.sun.management.jmxremote -Dcom.sun.management.jmxremote.port=64920 -Dcom.sun.management.jmxremote.authenticate=false -Dcom.sun.management.jmxremote.ssl=false -Dspring.jmx.enabled=true -Djava.rmi.server.hostname=localhost -Dspring.application.admin.enabled=true -Dspring.boot.project.name=api_gateway"
         },
         {
             "type": "java",
@@ -59,6 +61,17 @@
             "cwd": "${workspaceFolder}",
             "mainClass": "com.home_fixer_hub.profile_service.ProfileServiceApplication",
             "projectName": "profile_service",
+            "args": "",
+            "envFile": "${workspaceFolder}/.env",
+            "vmArgs": " -Dcom.sun.management.jmxremote -Dcom.sun.management.jmxremote.port=62881 -Dcom.sun.management.jmxremote.authenticate=false -Dcom.sun.management.jmxremote.ssl=false -Dspring.jmx.enabled=true -Djava.rmi.server.hostname=localhost -Dspring.application.admin.enabled=true -Dspring.boot.project.name=profile_service"
+        },
+        {
+            "type": "java",
+            "name": "Spring Boot-ReviewServiceApplication<review_service>",
+            "request": "launch",
+            "cwd": "${workspaceFolder}",
+            "mainClass": "com.home_fixer_hub.review_service.ReviewServiceApplication",
+            "projectName": "review_service",
             "args": "",
             "envFile": "${workspaceFolder}/.env"
         }

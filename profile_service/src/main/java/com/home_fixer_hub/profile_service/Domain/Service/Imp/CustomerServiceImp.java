@@ -67,15 +67,13 @@ public class CustomerServiceImp implements CustomerService {
             }
             return Mono.error(new RuntimeException("usuario de identidad no encontrado"));
         });
-        /*
-         * return Mono.fromCallable(() -> {
-         * Customer customer = customerMapper.toEntity(customerDTO);
-         * customer.setId(UUID.randomUUID().toString());
-         * return customer;
-         * }).flatMap(customerRepository::save).map(customerMapper::toDTO)
-         * .switchIfEmpty(Mono.error(new
-         * RuntimeException("Error al registrar el cliente")));
-         */
+    }
+
+    @Override
+    public Mono<CustomerDTO> getByUserId(String userId) {
+        return customerRepository.findByIdUsuario(userId).map(customerMapper::toDTO)
+                .switchIfEmpty(
+                        Mono.error(new RuntimeException("No se encontor el cluente vinculado a ese ID de usuario")));
     }
 
 }

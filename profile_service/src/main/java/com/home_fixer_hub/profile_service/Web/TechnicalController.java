@@ -37,6 +37,13 @@ public class TechnicalController {
         return technicalService.getAll(pageNumber, pageSize).map(value -> ResponseEntity.ok().body(value));
     }
 
+    @GetMapping("/available")
+    public Mono<ResponseEntity<AllTechnicalDTO>> getAllAvailable(
+            @RequestParam(defaultValue = Pagination.PAGE_NUMBER, required = false) int pageNumber,
+            @RequestParam(defaultValue = Pagination.PAGE_SIZE, required = false) int pageSize) {
+        return technicalService.getAllAvailable(pageNumber, pageSize).map(value -> ResponseEntity.ok(value));
+    }
+
     @GetMapping("/{technicalId}")
     public Mono<ResponseEntity<TechnicalDTO>> getById(@PathVariable String technicalId) {
         return technicalService.getbyId(technicalId).map(value -> ResponseEntity.ok(value)).onErrorResume(e -> {

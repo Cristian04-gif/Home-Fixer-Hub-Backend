@@ -21,7 +21,8 @@ public class Customer implements Persistable<String> {
     private String nombre;
     private String apellido;
     private String dni;
-    private String idUsuario; 
+    private String idUsuario;
+    private String urlFotoPerfil;
 
     @Transient
     @Builder.Default

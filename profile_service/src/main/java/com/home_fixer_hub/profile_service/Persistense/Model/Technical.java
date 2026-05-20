@@ -26,6 +26,7 @@ public class Technical implements Persistable<String> {
     private BigDecimal tarifa_visita;
     private Boolean disponible;
     private String idUsuario;
+    private String urlFotoPerfil;
 
     @Transient
     @Builder.Default

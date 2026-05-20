@@ -14,7 +14,8 @@ public interface TechnicalServiceMapper {
     @Mappings({
         @Mapping(source = "id", target = "id"),
         @Mapping(source = "idTecnico", target = "technicalId"),
-        @Mapping(source = "idServicio", target = "serviceId")
+        @Mapping(source = "idServicio", target = "serviceId"),
+        @Mapping(source = "descripcion", target = "description")
     })
 
     TechnicalServiceDTO toDTO(TechnicalService technicalService);

@@ -20,6 +20,7 @@ public class TechnicalService implements Persistable<String>{
     private String id;
     private String idTecnico;
     private String idServicio;
+    private String descripcion;
 
     @Transient
     @Builder.Default

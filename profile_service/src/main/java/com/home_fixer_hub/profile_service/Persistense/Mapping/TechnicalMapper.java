@@ -19,6 +19,7 @@ public interface TechnicalMapper {
             @Mapping(source = "tarifa_visita", target = "visitFee"),
             @Mapping(source = "disponible", target = "available"),
             @Mapping(source = "idUsuario", target = "userId"),
+            @Mapping(source = "urlFotoPerfil", target = "urlPhotoProfile")
     })
 
     TechnicalDTO toDTO(Technical technical);
