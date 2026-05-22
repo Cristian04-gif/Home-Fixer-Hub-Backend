@@ -6,7 +6,9 @@ import com.home_fixer_hub.catalog_service.Domain.DTO.Response.AllTechnicalDTO;
 import reactor.core.publisher.Mono;
 
 public interface TechnicalServiceService {
-    public Mono<TechnicalServiceDTO> assignSkill(String technicalId, String serviceId);
+    public Mono<TechnicalServiceDTO> assignSkill(TechnicalServiceDTO serviceDTO);
+
+    public Mono<TechnicalServiceDTO> getByTecnicalIdAndServiceId(String technicalId, String serviceId);
 
     public Mono<AllTechnicalDTO> getTechnicalsByService(String serviceId, int pageNumber, int pageSize);
 

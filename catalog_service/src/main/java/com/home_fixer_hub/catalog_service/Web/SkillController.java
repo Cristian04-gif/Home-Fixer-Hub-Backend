@@ -25,7 +25,7 @@ public class SkillController {
 
     @PostMapping("/assing/fixer")
     public Mono<ResponseEntity<TechnicalServiceDTO>> assignServiceToTechnician(@RequestBody TechnicalServiceDTO dto) {
-        return service.assignSkill(dto.technicalId(), dto.serviceId())
+        return service.assignSkill(dto)
                 .map(value -> ResponseEntity.status(HttpStatus.CREATED).body(value)).onErrorResume(e -> {
                     log.error("No se pudo asignar el servicio al tecnico, {}", e);
                     return Mono.just(ResponseEntity.status(HttpStatus.BAD_REQUEST).build());

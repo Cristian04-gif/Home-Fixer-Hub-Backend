@@ -9,7 +9,6 @@ import org.springframework.web.bind.annotation.RestController;
 import com.home_fixer_hub.catalog_service.Domain.DTO.TypeServiceDTO;
 import com.home_fixer_hub.catalog_service.Domain.Service.TypeServiceService;
 
-import jakarta.ws.rs.HeaderParam;
 import lombok.extern.log4j.Log4j2;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
