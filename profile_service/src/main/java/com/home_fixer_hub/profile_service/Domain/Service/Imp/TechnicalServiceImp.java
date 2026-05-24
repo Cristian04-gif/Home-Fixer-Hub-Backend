@@ -5,12 +5,14 @@ import java.util.UUID;
 
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
+import org.springframework.http.codec.multipart.FilePart;
 import org.springframework.stereotype.Service;
 
 import com.home_fixer_hub.profile_service.Domain.Client.CatalogClient;
 import com.home_fixer_hub.profile_service.Domain.Client.IdentityClient;
 import com.home_fixer_hub.profile_service.Domain.DTO.TechnicalDTO;
 import com.home_fixer_hub.profile_service.Domain.DTO.Response.AllTechnicalDTO;
+import com.home_fixer_hub.profile_service.Domain.Service.CloudinaryService;
 import com.home_fixer_hub.profile_service.Domain.Service.TechnicalService;
 import com.home_fixer_hub.profile_service.Persistense.Mapping.TechnicalMapper;
 import com.home_fixer_hub.profile_service.Persistense.Model.Technical;
@@ -27,6 +29,7 @@ public class TechnicalServiceImp implements TechnicalService {
     private final TechnicalMapper technicalMapper;
     private final IdentityClient identityClient;
     private final CatalogClient catalogClient;
+    private final CloudinaryService cloudinaryService;
 
     @Override
     public Mono<AllTechnicalDTO> getAll(int page, int size) {
@@ -97,7 +100,7 @@ public class TechnicalServiceImp implements TechnicalService {
 
     @Override
     public Mono<AllTechnicalDTO> getAllAvailable(int pageNumber, int pageSize) {
-        
+
         Mono<List<TechnicalDTO>> technicals = technicalRepository
                 .findAllByDisponibleTrue(PageRequest.of(pageNumber, pageSize, Sort.by("id").ascending()))
                 .map(technicalMapper::toDTO)
@@ -119,6 +122,20 @@ public class TechnicalServiceImp implements TechnicalService {
                     .last(last)
                     .build();
         });
+    }
+
+    @Override
+    public Mono<TechnicalDTO> uploadPhotoProfile(String technicalId, Mono<FilePart> filePartMono) {
+        return technicalRepository.findById(technicalId)
+                .switchIfEmpty(Mono.error(new RuntimeException("No se encontro el id de tecnico: " + technicalId)))
+                .flatMap(technical -> filePartMono.flatMap(cloudinaryService::uploadImageCloud)
+                        .flatMap(secureUrl ->
+                        technicalRepository.updatePhotoProfile(technicalId, secureUrl)
+                                .then(Mono.fromCallable(() -> {
+                                    technical.setUrlFotoPerfil(secureUrl);
+                                    return technical;
+                                }))))
+                .map(technicalMapper::toDTO);
     }
 
 }

@@ -9,6 +9,7 @@ public record TechnicalDTO(
         String dni,
         BigDecimal visitFee,
         Boolean available,
-        String userId) {
+        String userId,
+        String urlPhotoProfile) {
 
 }

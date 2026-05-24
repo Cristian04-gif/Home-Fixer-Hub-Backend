@@ -2,7 +2,9 @@ package com.home_fixer_hub.profile_service.Web;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.http.codec.multipart.FilePart;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -18,6 +20,7 @@ import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.PutMapping;
@@ -59,7 +62,16 @@ public class TechnicalController {
                     log.error("no se pudo registrar el tecnico, {}", e);
                     return Mono.just(ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build());
                 });
+    }
 
+    @PostMapping(value = "/fixer/{technicalId}/upload-perfile", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public Mono<ResponseEntity<TechnicalDTO>> uploadPhotoProfile(@PathVariable String technicalId,
+            @RequestPart("file") Mono<FilePart> filePartMono) {
+        return technicalService.uploadPhotoProfile(technicalId, filePartMono)
+                .map(value -> ResponseEntity.ok(value)).onErrorResume(e -> {
+                    log.error("No se pudo guardar la foto del tecnico, {}", e);
+                    return Mono.just(ResponseEntity.status(HttpStatus.BAD_REQUEST).build());
+                });
     }
 
     @PutMapping("/fixer/{technicalId}")

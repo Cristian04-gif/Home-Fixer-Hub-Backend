@@ -52,7 +52,7 @@ public class AuthenticationFilter extends AbstractGatewayFilterFactory<Authentic
                         throw new RuntimeException("Solo los técnicos pueden acceder aquí");
                     }
 
-                    if (path.contains("/customer/") && !role.equals("CLIENTE")) {
+                    if (path.contains("/customer") && !role.equalsIgnoreCase("CLIENTE")) {
                         throw new RuntimeException("Solo los clientes pueden acceder aquí");
                     }
 
@@ -62,6 +62,8 @@ public class AuthenticationFilter extends AbstractGatewayFilterFactory<Authentic
                             .build();
 
                 } catch (Exception e) {
+                    System.out.println("El filtro falló por esto: " + e.getClass().getName() + " -> " + e.getMessage());
+    e.printStackTrace();
                     throw new RuntimeException("Acceso no autorizado");
                 }
             }

@@ -5,11 +5,13 @@ import java.util.UUID;
 
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
+import org.springframework.http.codec.multipart.FilePart;
 import org.springframework.stereotype.Service;
 
 import com.home_fixer_hub.profile_service.Domain.Client.IdentityClient;
 import com.home_fixer_hub.profile_service.Domain.DTO.CustomerDTO;
 import com.home_fixer_hub.profile_service.Domain.DTO.Response.AllCustomerDTO;
+import com.home_fixer_hub.profile_service.Domain.Service.CloudinaryService;
 import com.home_fixer_hub.profile_service.Domain.Service.CustomerService;
 import com.home_fixer_hub.profile_service.Persistense.Mapping.CustomerMapper;
 import com.home_fixer_hub.profile_service.Persistense.Model.Customer;
@@ -25,6 +27,7 @@ public class CustomerServiceImp implements CustomerService {
     private final CustomerRepository customerRepository;
     private final CustomerMapper customerMapper;
     private final IdentityClient identityClient;
+    private final CloudinaryService cloudinaryService;
 
     @Override
     public Mono<AllCustomerDTO> getAll(int page, int size) {
@@ -74,6 +77,20 @@ public class CustomerServiceImp implements CustomerService {
         return customerRepository.findByIdUsuario(userId).map(customerMapper::toDTO)
                 .switchIfEmpty(
                         Mono.error(new RuntimeException("No se encontor el cluente vinculado a ese ID de usuario")));
+    }
+
+    @Override
+    public Mono<CustomerDTO> uploadPhotoProfile(String customerId, Mono<FilePart> filePartMono) {
+        return customerRepository.findById(customerId)
+                .switchIfEmpty(Mono.error(new RuntimeException("No se encontro el id de cliente: " + customerId)))
+                .flatMap(customer -> filePartMono.flatMap(cloudinaryService::uploadImageCloud)
+                        .flatMap(secureUrl ->
+                        customerRepository.updatePhotoProfile(customerId, secureUrl)
+                                .then(Mono.fromCallable(() -> {
+                                    customer.setUrlFotoPerfil(secureUrl);
+                                    return customer;
+                                }))))
+                .map(customerMapper::toDTO);
     }
 
 }

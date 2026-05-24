@@ -1,6 +1,8 @@
 package com.home_fixer_hub.profile_service.Persistense.Repository;
 
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.r2dbc.repository.Modifying;
+import org.springframework.data.r2dbc.repository.Query;
 import org.springframework.data.repository.reactive.ReactiveCrudRepository;
 import org.springframework.stereotype.Repository;
 
@@ -14,4 +16,7 @@ public interface CustomerRepository extends ReactiveCrudRepository<Customer, Str
 
     Flux<Customer> findAllBy(Pageable pageable); 
     Mono<Customer> findByIdUsuario(String idUsuario);
+    @Modifying
+    @Query("UPDATE clientes SET url_foto_perfil = :url WHERE id = :id")
+    Mono<Long> updatePhotoProfile(String id, String url);
 }
