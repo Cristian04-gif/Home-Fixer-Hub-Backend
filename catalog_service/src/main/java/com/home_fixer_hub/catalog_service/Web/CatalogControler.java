@@ -16,7 +16,6 @@ import lombok.extern.log4j.Log4j2;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
-import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -42,22 +41,7 @@ public class CatalogControler {
                 });
     }
 
-    @DeleteMapping("/fixer/remove-related-services/{technicalId}")
-    public Mono<ResponseEntity<Void>> deleteRelatedServices(@PathVariable String technicalId) {
-        return service.deleteByTechnical(technicalId).map(value -> ResponseEntity.noContent().build());
-
-    }
-
-    @GetMapping("/public/images-for-technicals-service/{serviceId}/tachnical/{technicalId}")
-    public Flux<ResponseEntity<ImagesDTO>> getImagesForTechnicalService(@PathVariable String technicalId,
-            @PathVariable String serviceId) {
-        return imagesService.getImagesByTechnicalServiceId(technicalId, serviceId)
-                .map(value -> ResponseEntity.ok(value))
-                .onErrorResume(e -> {
-                    log.error("NO se pudo completar la consulta de imagenes por tecnico, {}", e);
-                    return Mono.just(ResponseEntity.notFound().build());
-                });
-    }
+    
 
     @GetMapping("/public/technical-service/technical/{technicalId}/service/{serviceId}")
     public Mono<ResponseEntity<TechnicalServiceDTO>> getByTeachnicalAndService(@PathVariable String technicalId,

@@ -129,12 +129,18 @@ public class TechnicalServiceImp implements TechnicalService {
         return technicalRepository.findById(technicalId)
                 .switchIfEmpty(Mono.error(new RuntimeException("No se encontro el id de tecnico: " + technicalId)))
                 .flatMap(technical -> filePartMono.flatMap(cloudinaryService::uploadImageCloud)
-                        .flatMap(secureUrl ->
-                        technicalRepository.updatePhotoProfile(technicalId, secureUrl)
+                        .flatMap(secureUrl -> technicalRepository.updatePhotoProfile(technicalId, secureUrl)
                                 .then(Mono.fromCallable(() -> {
                                     technical.setUrlFotoPerfil(secureUrl);
                                     return technical;
                                 }))))
+                .map(technicalMapper::toDTO);
+    }
+
+    @Override
+    public Mono<TechnicalDTO> getByuserId(String userId) {
+        return technicalRepository.findByIdUsuario(userId)
+                .switchIfEmpty(Mono.error(new RuntimeException("NO se encontro el tecnico ocon el userID " + userId)))
                 .map(technicalMapper::toDTO);
     }
 

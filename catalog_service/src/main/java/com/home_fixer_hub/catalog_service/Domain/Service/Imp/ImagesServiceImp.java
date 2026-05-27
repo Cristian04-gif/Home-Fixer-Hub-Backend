@@ -1,10 +1,16 @@
 package com.home_fixer_hub.catalog_service.Domain.Service.Imp;
 
+import java.time.LocalDate;
+import java.util.UUID;
+
+import org.springframework.http.codec.multipart.FilePart;
 import org.springframework.stereotype.Service;
 
 import com.home_fixer_hub.catalog_service.Domain.DTO.ImagesDTO;
+import com.home_fixer_hub.catalog_service.Domain.Service.CloudinaryService;
 import com.home_fixer_hub.catalog_service.Domain.Service.ImagesService;
 import com.home_fixer_hub.catalog_service.Persitense.Mapping.ImagesMapper;
+import com.home_fixer_hub.catalog_service.Persitense.Model.Images;
 import com.home_fixer_hub.catalog_service.Persitense.Repository.ImagesRepository;
 import com.home_fixer_hub.catalog_service.Persitense.Repository.TechnicalServiceRepository;
 
@@ -20,15 +26,29 @@ public class ImagesServiceImp implements ImagesService {
     private final ImagesRepository imagesRepository;
     private final ImagesMapper imagesMapper;
 
+    private final CloudinaryService cloudinaryService;
+
     @Override
-    public Flux<ImagesDTO> getImagesByTechnicalServiceId(String technicalId, String serviceId) {
-        return repository.findAllByIdTecnico(technicalId)
-                .filter(value -> value.getIdServicio().equalsIgnoreCase(serviceId))
-                .flatMap(value -> imagesRepository.findAllByIdTecnicoServicio(value.getId()))
-                .map(imagesMapper::toDTO)
-                .switchIfEmpty(Mono.error(new RuntimeException(
-                        "No se encontro las images relacionados con el tenico de id "
-                                + technicalId)));
+    public Flux<ImagesDTO> getImagesByTechnicalServiceId(String id) {
+        return imagesRepository.findAllByIdTecnicoServicio(id).switchIfEmpty(Mono.error(new RuntimeException("No se encontro las imagenes de esta relacion")))
+                .map(imagesMapper::toDTO);
+    }
+
+    @Override
+    public Flux<ImagesDTO> assignImagesToTechnicianAndServiceRelationships(String technicalServiceId,
+            Flux<FilePart> filePartFlux) {
+        return repository.findById(technicalServiceId).switchIfEmpty(Mono.error(new RuntimeException(
+                "No se encontor la informacion relacionado con el tecnico y servicio " + technicalServiceId)))
+                .flatMapMany(
+                        value -> filePartFlux.flatMap(cloudinaryService::uploadImageCloud).flatMap(secureUrl -> {
+                            Images images = Images.builder()
+                                    .id(UUID.randomUUID().toString())
+                                    .url(secureUrl)
+                                    .fechaRegistro(LocalDate.now())
+                                    .idTecnicoServicio(technicalServiceId)
+                                    .build();
+                            return imagesRepository.save(images).map(imagesMapper::toDTO);
+                        }));
     }
 
 }

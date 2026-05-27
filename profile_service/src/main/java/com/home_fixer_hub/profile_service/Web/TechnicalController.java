@@ -55,6 +55,14 @@ public class TechnicalController {
         });
     }
 
+    @GetMapping("/fixer/user/{userId}")
+    public Mono<ResponseEntity<TechnicalDTO>> getbyUserId(@PathVariable String userId){
+        return technicalService.getByuserId(userId).map(value -> ResponseEntity.ok(value)).onErrorResume(e ->{
+            log.error("no se encontro el tecnico relacionado con el id de usuarios: "+userId);
+            return Mono.just(ResponseEntity.notFound().build());
+        });
+    }
+
     @PostMapping("/fixer")
     public Mono<ResponseEntity<TechnicalDTO>> register(@RequestBody TechnicalDTO technicalDTO) {
         return technicalService.register(technicalDTO)

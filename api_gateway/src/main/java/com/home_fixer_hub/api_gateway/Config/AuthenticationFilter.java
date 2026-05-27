@@ -44,11 +44,11 @@ public class AuthenticationFilter extends AbstractGatewayFilterFactory<Authentic
                     String username = jwtUtil.extractUsername(authHeader);
 
                     // Lógica de autorización simple
-                    if (path.contains("/admin/") && !role.equals("ADMIN")) {
+                    if (path.contains("/admin") && !role.equalsIgnoreCase("ADMIN")) {
                         throw new RuntimeException("No tienes permisos de administrador");
                     }
 
-                    if (path.contains("/fixer/") && !role.equals("TECNICO")) {
+                    if (path.contains("/fixer") && !role.equalsIgnoreCase("TECNICO")) {
                         throw new RuntimeException("Solo los técnicos pueden acceder aquí");
                     }
 

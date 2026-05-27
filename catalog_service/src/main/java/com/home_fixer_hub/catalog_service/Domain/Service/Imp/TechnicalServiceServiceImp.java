@@ -15,10 +15,12 @@ import com.home_fixer_hub.catalog_service.Domain.Service.TechnicalServiceService
 import com.home_fixer_hub.catalog_service.Persitense.Mapping.TechnicalServiceMapper;
 import com.home_fixer_hub.catalog_service.Persitense.Mapping.TypeServiceMapper;
 import com.home_fixer_hub.catalog_service.Persitense.Model.TechnicalService;
+import com.home_fixer_hub.catalog_service.Persitense.Repository.ImagesRepository;
 import com.home_fixer_hub.catalog_service.Persitense.Repository.TechnicalServiceRepository;
 import com.home_fixer_hub.catalog_service.Persitense.Repository.TypeServiceRepository;
 
 import lombok.RequiredArgsConstructor;
+import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 @Service
@@ -31,6 +33,8 @@ public class TechnicalServiceServiceImp implements TechnicalServiceService {
 
         private final TypeServiceRepository serviceRepository;
         private final TypeServiceMapper serviceMapper;
+
+        private final ImagesRepository imagesRepository;
 
         @Override
         public Mono<TechnicalServiceDTO> assignSkill(TechnicalServiceDTO technicalServiceDTO) {
@@ -80,9 +84,12 @@ public class TechnicalServiceServiceImp implements TechnicalServiceService {
         @Override
         public Mono<Void> deleteByTechnical(String technicalId) {
                 return profileClient.getTechnicalById(technicalId)
-                                .flatMap(technical -> repository.deleteAllByIdTecnico(technicalId))
                                 .switchIfEmpty(Mono.error(new RuntimeException(
-                                                "No se encontro el tecnico con id: " + technicalId)));
+                                                "No se encontro el tecnico con id: " + technicalId)))
+                                .flatMapMany(technical -> repository.findAllByIdTecnico(technicalId))
+                                .flatMap(value -> imagesRepository.deleteAllByIdTecnicoServicio(value.getId())
+                                                .then(repository.delete(value)))
+                                .then(); 
         }
 
         @Override
@@ -91,6 +98,30 @@ public class TechnicalServiceServiceImp implements TechnicalServiceService {
                                 .switchIfEmpty(Mono.error(new RuntimeException(
                                                 "No se encontro la informacion relaicionada con el tecnico: "
                                                                 + technicalId + " y el servicio: " + serviceId)));
+        }
+
+        @Override
+        public Flux<TypeServiceDTO> getSericesFortechnical(String technicalId) {
+                return profileClient.getTechnicalById(technicalId)
+                                .switchIfEmpty(Mono.error(
+                                                new RuntimeException("No se encontro al tecnico " + technicalId)))
+                                .flatMapMany(technical -> {
+                                        return repository.findAllByIdTecnico(technical.id())
+                                                        .flatMap(value -> serviceRepository
+                                                                        .findById(value.getIdServicio())
+                                                                        .map(serviceMapper::toDTO));
+                                });
+        }
+
+        @Override
+        public Mono<Void> removeSkill(String technicalId, String serviceId) {
+                return repository.findByIdTecnicoAndIdServicio(technicalId, serviceId)
+                                .switchIfEmpty(Mono.error(new RuntimeException(
+                                                "No se pudo eliminar la relacion del tecnico con el servicio")))
+                                .flatMap(value -> {
+                                        imagesRepository.deleteAllByIdTecnicoServicio(value.getId());
+                                        return repository.delete(value);
+                                });
         }
 
 }

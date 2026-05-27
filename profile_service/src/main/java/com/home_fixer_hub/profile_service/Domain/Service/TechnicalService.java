@@ -15,6 +15,8 @@ public interface TechnicalService {
 
     public Mono<TechnicalDTO> getbyId(String technicalid);
 
+    public Mono<TechnicalDTO> getByuserId(String userId);
+
     public Mono<TechnicalDTO> register(TechnicalDTO technicalDTO);
 
     public Mono<TechnicalDTO> uploadPhotoProfile(String technicalId, Mono<FilePart> filePartMono);
