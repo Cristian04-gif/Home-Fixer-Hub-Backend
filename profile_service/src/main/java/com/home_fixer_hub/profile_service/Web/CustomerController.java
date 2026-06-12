@@ -48,8 +48,8 @@ public class CustomerController {
     }
 
     @GetMapping("/customer/userId/{userId}")
-    public Mono<ResponseEntity<CustomerDTO>> getByUserId(@PathVariable String userId){
-        return customerService.getByUserId(userId).map(value -> ResponseEntity.ok(value)).onErrorResume(e ->{
+    public Mono<ResponseEntity<CustomerDTO>> getByUserId(@PathVariable String userId) {
+        return customerService.getByUserId(userId).map(value -> ResponseEntity.ok(value)).onErrorResume(e -> {
             log.error("No se encontro el user id, {}", e);
             return Mono.just(ResponseEntity.notFound().build());
         });
@@ -58,19 +58,17 @@ public class CustomerController {
     @PostMapping("/customer")
     public Mono<ResponseEntity<CustomerDTO>> register(@RequestHeader("Authorization") String auth,
             @RequestBody CustomerDTO customerDTO) {
-        System.out.println(auth);
         return customerService.register(customerDTO)
                 .map(value -> ResponseEntity.status(HttpStatus.CREATED).body(value)).onErrorResume(e -> {
                     log.error("no se pudo registrar el cliente, {}", e);
                     return Mono.just(ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build());
                 });
-
     }
 
     @PostMapping(value = "/customer/{customerId}/upload-perfile", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public Mono<ResponseEntity<CustomerDTO>> uploadPhotoProfile(@PathVariable String customerId,
             @RequestPart("file") Mono<FilePart> filePartMono) {
-                System.out.println("entro al registro de foto");
+        System.out.println("entro al registro de foto");
         return customerService.uploadPhotoProfile(customerId, filePartMono)
                 .map(value -> ResponseEntity.ok(value)).onErrorResume(e -> {
                     log.error("No se pudo guardar la foto del cliente, {}", e);

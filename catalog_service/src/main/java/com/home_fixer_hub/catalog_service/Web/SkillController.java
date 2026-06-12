@@ -28,11 +28,6 @@ public class SkillController {
     @Autowired
     private TechnicalServiceService service;
 
-    @GetMapping("/fixer/technical/{technicalId}")
-    public Flux<TypeServiceDTO> getServicesForTechnical(@PathVariable String technicalId) {
-        return service.getSericesFortechnical(technicalId);
-    }
-
     @PostMapping("/assing/fixer")
     public Mono<ResponseEntity<TechnicalServiceDTO>> assignServiceToTechnician(@RequestBody TechnicalServiceDTO dto) {
         return service.assignSkill(dto)
@@ -40,6 +35,16 @@ public class SkillController {
                     log.error("No se pudo asignar el servicio al tecnico, {}", e);
                     return Mono.just(ResponseEntity.status(HttpStatus.BAD_REQUEST).build());
                 });
+    }
+
+    @DeleteMapping("/remove/fixer/{technicalId}/service/{serviceId}")
+    public Mono<ResponseEntity<Void>> removeSkill(@PathVariable String technicalId, @PathVariable String serviceId) {
+        return service.removeSkill(technicalId, serviceId).map(value -> ResponseEntity.noContent().build());
+    }
+
+    @GetMapping("/fixer/technical/{technicalId}")
+    public Flux<TypeServiceDTO> getTechnicianServices(@PathVariable String technicalId) {
+        return service.getTechnicianServices(technicalId);
     }
 
     @DeleteMapping("/fixer/remove-related-services/{technicalId}")

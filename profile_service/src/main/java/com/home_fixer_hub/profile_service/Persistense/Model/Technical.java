@@ -1,7 +1,5 @@
 package com.home_fixer_hub.profile_service.Persistense.Model;
 
-import java.math.BigDecimal;
-
 import org.springframework.data.annotation.Id;
 import org.springframework.data.annotation.Transient;
 import org.springframework.data.domain.Persistable;
@@ -23,7 +21,6 @@ public class Technical implements Persistable<String> {
     private String nombre;
     private String apellido;
     private String dni;
-    private BigDecimal tarifa_visita;
     private Boolean disponible;
     private String idUsuario;
     private String urlFotoPerfil;

@@ -33,32 +33,10 @@ public class TechnicalController {
     @Autowired
     private TechnicalService technicalService;
 
-    @GetMapping("")
-    public Mono<ResponseEntity<AllTechnicalDTO>> getAll(
-            @RequestParam(defaultValue = Pagination.PAGE_NUMBER, required = false) int pageNumber,
-            @RequestParam(defaultValue = Pagination.PAGE_SIZE, required = false) int pageSize) {
-        return technicalService.getAll(pageNumber, pageSize).map(value -> ResponseEntity.ok().body(value));
-    }
-
-    @GetMapping("/available")
-    public Mono<ResponseEntity<AllTechnicalDTO>> getAllAvailable(
-            @RequestParam(defaultValue = Pagination.PAGE_NUMBER, required = false) int pageNumber,
-            @RequestParam(defaultValue = Pagination.PAGE_SIZE, required = false) int pageSize) {
-        return technicalService.getAllAvailable(pageNumber, pageSize).map(value -> ResponseEntity.ok(value));
-    }
-
     @GetMapping("/{technicalId}")
     public Mono<ResponseEntity<TechnicalDTO>> getById(@PathVariable String technicalId) {
         return technicalService.getbyId(technicalId).map(value -> ResponseEntity.ok(value)).onErrorResume(e -> {
             log.error("No se encontro el tecnico con el ID, {}", technicalId, e);
-            return Mono.just(ResponseEntity.notFound().build());
-        });
-    }
-
-    @GetMapping("/fixer/user/{userId}")
-    public Mono<ResponseEntity<TechnicalDTO>> getbyUserId(@PathVariable String userId){
-        return technicalService.getByuserId(userId).map(value -> ResponseEntity.ok(value)).onErrorResume(e ->{
-            log.error("no se encontro el tecnico relacionado con el id de usuarios: "+userId);
             return Mono.just(ResponseEntity.notFound().build());
         });
     }
@@ -91,9 +69,44 @@ public class TechnicalController {
                 });
     }
 
+    @PutMapping("/fixer/{technicalId}/availability")
+    public Mono<ResponseEntity<TechnicalDTO>> changeAvailability(@PathVariable String technicalId) {
+        return technicalService.changeAvailability(technicalId).map(value -> ResponseEntity.ok(value)).onErrorResume(e ->{
+            log.error("No se pudo actualizar el estado del tecnico {}", e);
+            return Mono.just(ResponseEntity.notFound().build());
+        });
+    }
+    
+    @GetMapping("/fixer/user/{userId}")
+    public Mono<ResponseEntity<TechnicalDTO>> getByUserId(@PathVariable String userId) {
+        return technicalService.getByuserId(userId).map(value -> ResponseEntity.ok(value)).onErrorResume(e -> {
+            log.error("no se encontro el tecnico relacionado con el id de usuarios: " + userId);
+            return Mono.just(ResponseEntity.notFound().build());
+        });
+    }
+
     @DeleteMapping("/fixer/{technicalId}")
     public Mono<ResponseEntity<Void>> deleteById(@PathVariable String technicalId) {
         return technicalService.deleteById(technicalId).map(vales -> ResponseEntity.noContent().build());
+    }
+
+    // tecnicos cercanos
+    // top tecnicos
+
+    /////////////////////////////
+
+    @GetMapping("")
+    public Mono<ResponseEntity<AllTechnicalDTO>> getAll(
+            @RequestParam(defaultValue = Pagination.PAGE_NUMBER, required = false) int pageNumber,
+            @RequestParam(defaultValue = Pagination.PAGE_SIZE, required = false) int pageSize) {
+        return technicalService.getAll(pageNumber, pageSize).map(value -> ResponseEntity.ok().body(value));
+    }
+
+    @GetMapping("/available")
+    public Mono<ResponseEntity<AllTechnicalDTO>> getAllAvailable(
+            @RequestParam(defaultValue = Pagination.PAGE_NUMBER, required = false) int pageNumber,
+            @RequestParam(defaultValue = Pagination.PAGE_SIZE, required = false) int pageSize) {
+        return technicalService.getAllAvailable(pageNumber, pageSize).map(value -> ResponseEntity.ok(value));
     }
 
 }

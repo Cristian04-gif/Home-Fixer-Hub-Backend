@@ -1,5 +1,7 @@
 package com.home_fixer_hub.catalog_service.Persitense.Model;
 
+import java.math.BigDecimal;
+
 import org.springframework.data.annotation.Id;
 import org.springframework.data.annotation.Transient;
 import org.springframework.data.domain.Persistable;
@@ -21,6 +23,7 @@ public class TechnicalService implements Persistable<String>{
     private String idTecnico;
     private String idServicio;
     private String descripcion;
+    private BigDecimal precioBase;
 
     @Transient
     @Builder.Default

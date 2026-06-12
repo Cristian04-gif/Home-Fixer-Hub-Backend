@@ -22,4 +22,9 @@ public interface TechnicalRepository extends ReactiveCrudRepository<Technical, S
     @Modifying
     @Query("UPDATE tecnicos SET url_foto_perfil = :url WHERE id = :id")
     Mono<Long> updatePhotoProfile(String id, String url);
+
+    @Modifying
+    @Query("UPDATE tecnicos SET disponible = :disponible WHERE id = :id")
+    Mono<Long> updateAvailability(String id, Boolean disponible);
+
 }

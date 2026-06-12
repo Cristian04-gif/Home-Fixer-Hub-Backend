@@ -17,7 +17,7 @@ public class SecurityConfig {
         return http
             .csrf(csrf -> csrf.disable()) // Deshabilitado para APIs con JWT
             .authorizeExchange(exchanges -> exchanges
-                .pathMatchers("/auth/register", "/auth/login", "/auth/validate/**").permitAll()
+                .pathMatchers("/api/auth/**").permitAll()
                 .anyExchange().authenticated()
             )
             //.addFilterAt(customJwtFilter, SecurityWebFiltersOrder.AUTHENTICATION) // Tu filtro de JWT

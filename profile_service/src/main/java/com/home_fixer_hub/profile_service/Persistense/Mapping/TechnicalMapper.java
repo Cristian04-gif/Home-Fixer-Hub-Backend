@@ -16,7 +16,6 @@ public interface TechnicalMapper {
             @Mapping(source = "nombre", target = "name"),
             @Mapping(source = "apellido", target = "lastName"),
             @Mapping(source = "dni", target = "dni"),
-            @Mapping(source = "tarifa_visita", target = "visitFee"),
             @Mapping(source = "disponible", target = "available"),
             @Mapping(source = "idUsuario", target = "userId"),
             @Mapping(source = "urlFotoPerfil", target = "urlPhotoProfile")

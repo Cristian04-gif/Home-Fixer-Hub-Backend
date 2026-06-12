@@ -24,7 +24,7 @@ public class ApiGatewayApplication {
 	@Bean
 	public RouteLocator customRouteLocator(RouteLocatorBuilder builder) {
 		return builder.routes()
-				.route("identity-route", r -> r.path("/auth/**")
+				.route("identity-route", r -> r.path("/api/auth/**")
 						.uri("lb://IDENTITY-SERVICE"))
 				.route("profile-service", r -> r.path("/api/profile/**")
 						.filters(f -> f.filter(authenticationFilter.apply(new AuthenticationFilter.Config())))

@@ -9,10 +9,6 @@ import reactor.core.publisher.Mono;
 
 public interface TechnicalService {
 
-    public Mono<AllTechnicalDTO> getAll(int page, int size);
-
-    public Mono<AllTechnicalDTO> getAllAvailable(int pageNumber, int pageSize);
-
     public Mono<TechnicalDTO> getbyId(String technicalid);
 
     public Mono<TechnicalDTO> getByuserId(String userId);
@@ -23,6 +19,15 @@ public interface TechnicalService {
 
     public Mono<TechnicalDTO> update(String technicalId, TechnicalDTO technicalDTO);
 
+    public Mono<TechnicalDTO> changeAvailability(String technicalId);
+
     public Mono<Void> deleteById(String technicalId);
+    
+    ///////////////////////////////////
+    /// 
+    
+    public Mono<AllTechnicalDTO> getAll(int page, int size);
+
+    public Mono<AllTechnicalDTO> getAllAvailable(int pageNumber, int pageSize);
 
 }

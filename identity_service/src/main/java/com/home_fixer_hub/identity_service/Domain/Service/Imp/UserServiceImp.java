@@ -1,18 +1,15 @@
 package com.home_fixer_hub.identity_service.Domain.Service.Imp;
 
 import java.time.LocalDate;
-import java.util.List;
+import java.util.Base64;
 import java.util.UUID;
 
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Sort;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import com.home_fixer_hub.identity_service.Domain.DTO.UserDTO;
 import com.home_fixer_hub.identity_service.Domain.DTO.Request.AuthRequest;
 import com.home_fixer_hub.identity_service.Domain.DTO.Response.AuthResponse;
-import com.home_fixer_hub.identity_service.Domain.DTO.Response.UserResponse;
 import com.home_fixer_hub.identity_service.Domain.Service.JwtService;
 import com.home_fixer_hub.identity_service.Domain.Service.UserService;
 import com.home_fixer_hub.identity_service.Persistense.Mapping.UserMapper;
@@ -32,29 +29,10 @@ public class UserServiceImp implements UserService {
     private final PasswordEncoder passwordEncoder;
 
     @Override
-    public Mono<UserResponse> getAll(int page, int size) {
-
-        Mono<List<UserDTO>> userFlux = userRepository.findAllBy(PageRequest.of(page,
-                size, Sort.by("id").ascending()))
-                .map(userMapper::toDTO).collectList();
-
-        Mono<Long> count = userRepository.count();
-
-        return Mono.zip(userFlux, count).map(tuple -> {
-            List<UserDTO> users = tuple.getT1();
-            long totalElements = tuple.getT2();
-            int totalPages = (int) Math.ceil((double) totalElements / size);
-            boolean last = page >= totalPages - 1;
-            return UserResponse.builder()
-                    .users(users)
-                    .pageNumber(page)
-                    .pageSize(totalElements > 0 ? size : 0)
-                    .totalElements(totalElements)
-                    .totalPages(totalPages)
-                    .last(last)
-                    .build();
-        });
-
+    public Mono<UserDTO> getById(String userId) {
+        return userRepository.findById(userId)
+                .switchIfEmpty(Mono.error(new RuntimeException("No se encontor el usuario con el id: " + userId)))
+                .map(userMapper::toDTO);
     }
 
     @Override
@@ -93,6 +71,24 @@ public class UserServiceImp implements UserService {
     @Override
     public Mono<Boolean> validateUser(String userId) {
         return userRepository.existsById(userId);
+    }
+
+    @Override
+    public Mono<AuthResponse> refreshToken(String token) {
+        return Mono.fromCallable(() -> {
+            String[] chunks = token.split("\\.");
+            Base64.Decoder decoder = Base64.getUrlDecoder();
+            String payload = new String(decoder.decode(chunks[1]));
+            return payload;
+        }).flatMap(value -> {
+            String userId = value.split(",")[1].split(":")[1].replaceAll("\"", "");
+            return userRepository.findById(userId)
+                    .switchIfEmpty(Mono.error(new RuntimeException("No se encontró el usuario con el id: " + userId)))
+                    .map(user -> {
+                        String newToken = jwtService.generateToken(user.getEmail(), user.getRol(), user.getId());
+                        return new AuthResponse(user.getId(), newToken);
+                    });
+        });
     }
 
 }

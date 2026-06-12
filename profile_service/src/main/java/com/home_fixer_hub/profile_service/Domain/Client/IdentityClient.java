@@ -20,7 +20,7 @@ public class IdentityClient {
 
     public Mono<Boolean> isValidUser(String userId) {
         return webClient.get()
-                .uri("/auth/validate/{userId}", userId)
+                .uri("/api/auth/validate/{userId}", userId)
                 .retrieve()
                 .toBodilessEntity()
                 .map(response -> response.getStatusCode().is2xxSuccessful())

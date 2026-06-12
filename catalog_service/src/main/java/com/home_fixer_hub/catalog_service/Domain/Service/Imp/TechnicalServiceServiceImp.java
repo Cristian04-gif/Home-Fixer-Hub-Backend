@@ -44,6 +44,7 @@ public class TechnicalServiceServiceImp implements TechnicalServiceService {
                                         .idTecnico(technicalServiceDTO.technicalId())
                                         .idServicio(technicalServiceDTO.serviceId())
                                         .descripcion(technicalServiceDTO.description())
+                                        .precioBase(technicalServiceDTO.basePrice())
                                         .build();
                         return repository.save(service);
                 }).map(mapper::toDTO)
@@ -89,7 +90,7 @@ public class TechnicalServiceServiceImp implements TechnicalServiceService {
                                 .flatMapMany(technical -> repository.findAllByIdTecnico(technicalId))
                                 .flatMap(value -> imagesRepository.deleteAllByIdTecnicoServicio(value.getId())
                                                 .then(repository.delete(value)))
-                                .then(); 
+                                .then();
         }
 
         @Override
@@ -101,7 +102,7 @@ public class TechnicalServiceServiceImp implements TechnicalServiceService {
         }
 
         @Override
-        public Flux<TypeServiceDTO> getSericesFortechnical(String technicalId) {
+        public Flux<TypeServiceDTO> getTechnicianServices(String technicalId) {
                 return profileClient.getTechnicalById(technicalId)
                                 .switchIfEmpty(Mono.error(
                                                 new RuntimeException("No se encontro al tecnico " + technicalId)))
@@ -114,10 +115,9 @@ public class TechnicalServiceServiceImp implements TechnicalServiceService {
         }
 
         @Override
-        public Mono<Void> removeSkill(String technicalId, String serviceId) {
-                return repository.findByIdTecnicoAndIdServicio(technicalId, serviceId)
-                                .switchIfEmpty(Mono.error(new RuntimeException(
-                                                "No se pudo eliminar la relacion del tecnico con el servicio")))
+        public Mono<Void> removeSkill(String technical, String serviceId) {
+                return repository.findByIdTecnicoAndIdServicio(technical, serviceId).switchIfEmpty(Mono.error(new RuntimeException(
+                                "No se pudo eliminar la relacion del tecnico con el servicio")))
                                 .flatMap(value -> {
                                         imagesRepository.deleteAllByIdTecnicoServicio(value.getId());
                                         return repository.delete(value);

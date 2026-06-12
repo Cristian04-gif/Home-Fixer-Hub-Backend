@@ -16,8 +16,8 @@ public interface TechnicalServiceService {
 
     public Mono<Void> deleteByTechnical(String technicalId);
 
-    public Flux<TypeServiceDTO> getSericesFortechnical(String technicalId);
+    public Flux<TypeServiceDTO> getTechnicianServices(String technicalId);
 
-    public Mono<Void> removeSkill(String technicalId, String serviceId);
+    public Mono<Void> removeSkill(String technical, String serviceId);
 
 }

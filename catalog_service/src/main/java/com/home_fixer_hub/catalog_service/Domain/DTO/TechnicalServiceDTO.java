@@ -1,10 +1,13 @@
 package com.home_fixer_hub.catalog_service.Domain.DTO;
 
+import java.math.BigDecimal;
+
 public record TechnicalServiceDTO(
     String id,
     String technicalId,
     String serviceId,
-    String description
+    String description,
+    BigDecimal basePrice
 ) {
 
 }

@@ -11,9 +11,10 @@ public class RouteValidator {
 
     // Lista de endpoints que no requieren JWT
     public static final List<String> openApiEndpoints = List.of(
-            "/auth/register",
-            "/auth/login",
-            "/eureka"
+            "/api/auth/register",
+            "/api/auth/login",
+            "/eureka",
+            "/api/auth/validate/**"
     );
 
     public Predicate<ServerHttpRequest> isSecured = 

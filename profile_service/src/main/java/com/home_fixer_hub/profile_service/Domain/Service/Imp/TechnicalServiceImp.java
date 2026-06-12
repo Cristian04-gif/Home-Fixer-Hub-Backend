@@ -32,6 +32,80 @@ public class TechnicalServiceImp implements TechnicalService {
     private final CloudinaryService cloudinaryService;
 
     @Override
+    public Mono<TechnicalDTO> getbyId(String technicalid) {
+        return technicalRepository.findById(technicalid).map(technicalMapper::toDTO)
+                .switchIfEmpty(Mono.error(new RuntimeException("Tecnico no encontrado")));
+    }
+
+    @Override
+    public Mono<TechnicalDTO> getByuserId(String userId) {
+        return technicalRepository.findByIdUsuario(userId)
+                .switchIfEmpty(Mono.error(new RuntimeException("NO se encontro el tecnico ocon el userID " + userId)))
+                .map(technicalMapper::toDTO);
+    }
+
+    @Override
+    public Mono<TechnicalDTO> register(TechnicalDTO technicalDTO) {
+        return identityClient.isValidUser(technicalDTO.userId()).flatMap(isValid -> {
+            if (isValid) {
+                Technical technical = technicalMapper.toEntity(technicalDTO);
+                technical.setId(UUID.randomUUID().toString());
+                technical.setDisponible(true);
+                return technicalRepository.save(technical).map(technicalMapper::toDTO);
+            }
+            return Mono.error(new RuntimeException("Usuario de identidad no encontrado"));
+        });
+
+    }
+
+    @Override
+    public Mono<TechnicalDTO> uploadPhotoProfile(String technicalId, Mono<FilePart> filePartMono) {
+        return technicalRepository.findById(technicalId)
+                .switchIfEmpty(Mono.error(new RuntimeException("No se encontro el id de tecnico: " + technicalId)))
+                .flatMap(technical -> filePartMono.flatMap(cloudinaryService::uploadImageCloud)
+                        .flatMap(secureUrl -> technicalRepository.updatePhotoProfile(technicalId, secureUrl)
+                                .then(Mono.fromCallable(() -> {
+                                    technical.setUrlFotoPerfil(secureUrl);
+                                    return technical;
+                                }))))
+                .map(technicalMapper::toDTO);
+    }
+
+    @Override
+    public Mono<TechnicalDTO> update(String technicalId, TechnicalDTO technicalDTO) {
+        return technicalRepository.findById(technicalId).flatMap(technical -> {
+            technical.setNombre(technicalDTO.name());
+            technical.setApellido(technicalDTO.lastName());
+            technical.setDni(technicalDTO.dni());
+            return technicalRepository.save(technical).map(technicalMapper::toDTO);
+        }).switchIfEmpty(Mono.error(new RuntimeException("No se encontro el tecnico mediante el id: " + technicalId)));
+    }
+
+    @Override
+    public Mono<TechnicalDTO> changeAvailability(String technicalId) {
+        return technicalRepository.findById(technicalId)
+                .switchIfEmpty(Mono.error(new RuntimeException("No se encontro el tecnico con el id: " + technicalId)))
+                .flatMap(technical -> technicalRepository.updateAvailability(technicalId, !technical.getDisponible())
+                        .then(Mono.fromCallable(() -> {
+                            technical.setDisponible(!technical.getDisponible());
+                            return technical;
+                        })))
+                .map(technicalMapper::toDTO);
+    }
+
+    @Override
+    public Mono<Void> deleteById(String technicalId) {
+        return technicalRepository.findById(technicalId)
+                .flatMap(value -> {
+                    catalogClient.deleteRelatedServices(value.getId());
+                    return technicalRepository.delete(value);
+                })
+                .switchIfEmpty(Mono.error(new RuntimeException("No se encontor el tecnico con el id: " + technicalId)));
+    }
+
+    ////////////////////////////
+
+    @Override
     public Mono<AllTechnicalDTO> getAll(int page, int size) {
 
         Mono<List<TechnicalDTO>> technicals = technicalRepository
@@ -55,47 +129,6 @@ public class TechnicalServiceImp implements TechnicalService {
                     .build();
         });
 
-    }
-
-    @Override
-    public Mono<TechnicalDTO> getbyId(String technicalid) {
-        return technicalRepository.findById(technicalid).map(technicalMapper::toDTO)
-                .switchIfEmpty(Mono.error(new RuntimeException("Tecnico no encontrado")));
-    }
-
-    @Override
-    public Mono<TechnicalDTO> register(TechnicalDTO technicalDTO) {
-        return identityClient.isValidUser(technicalDTO.userId()).flatMap(isValid -> {
-            if (isValid) {
-                Technical technical = technicalMapper.toEntity(technicalDTO);
-                technical.setId(UUID.randomUUID().toString());
-                technical.setDisponible(true);
-                return technicalRepository.save(technical).map(technicalMapper::toDTO);
-            }
-            return Mono.error(new RuntimeException("Usuario de identidad no encontrado"));
-        });
-
-    }
-
-    @Override
-    public Mono<TechnicalDTO> update(String technicalId, TechnicalDTO technicalDTO) {
-        return technicalRepository.findById(technicalId).flatMap(technical -> {
-            technical.setNombre(technicalDTO.name());
-            technical.setApellido(technicalDTO.lastName());
-            technical.setDni(technicalDTO.dni());
-            technical.setTarifa_visita(technicalDTO.visitFee());
-            return technicalRepository.save(technical).map(technicalMapper::toDTO);
-        }).switchIfEmpty(Mono.error(new RuntimeException("No se encontro el tecnico mediante el id: " + technicalId)));
-    }
-
-    @Override
-    public Mono<Void> deleteById(String technicalId) {
-        return technicalRepository.findById(technicalId)
-                .flatMap(value -> {
-                    catalogClient.deleteRelatedServices(value.getId());
-                    return technicalRepository.delete(value);
-                })
-                .switchIfEmpty(Mono.error(new RuntimeException("No se encontor el tecnico con el id: " + technicalId)));
     }
 
     @Override
@@ -123,25 +156,4 @@ public class TechnicalServiceImp implements TechnicalService {
                     .build();
         });
     }
-
-    @Override
-    public Mono<TechnicalDTO> uploadPhotoProfile(String technicalId, Mono<FilePart> filePartMono) {
-        return technicalRepository.findById(technicalId)
-                .switchIfEmpty(Mono.error(new RuntimeException("No se encontro el id de tecnico: " + technicalId)))
-                .flatMap(technical -> filePartMono.flatMap(cloudinaryService::uploadImageCloud)
-                        .flatMap(secureUrl -> technicalRepository.updatePhotoProfile(technicalId, secureUrl)
-                                .then(Mono.fromCallable(() -> {
-                                    technical.setUrlFotoPerfil(secureUrl);
-                                    return technical;
-                                }))))
-                .map(technicalMapper::toDTO);
-    }
-
-    @Override
-    public Mono<TechnicalDTO> getByuserId(String userId) {
-        return technicalRepository.findByIdUsuario(userId)
-                .switchIfEmpty(Mono.error(new RuntimeException("NO se encontro el tecnico ocon el userID " + userId)))
-                .map(technicalMapper::toDTO);
-    }
-
 }
