@@ -1,7 +1,6 @@
 package com.home_fixer_hub.catalog_service.Domain.Service.Imp;
 
 import java.time.LocalDate;
-import java.util.UUID;
 
 import org.springframework.http.codec.multipart.FilePart;
 import org.springframework.stereotype.Service;
@@ -30,7 +29,8 @@ public class ImagesServiceImp implements ImagesService {
 
     @Override
     public Flux<ImagesDTO> getImagesByTechnicalServiceId(String id) {
-        return imagesRepository.findAllByIdTecnicoServicio(id).switchIfEmpty(Mono.error(new RuntimeException("No se encontro las imagenes de esta relacion")))
+        return imagesRepository.findAllByIdTecnicoServicio(id)
+                .switchIfEmpty(Mono.error(new RuntimeException("No se encontro las imagenes de esta relacion")))
                 .map(imagesMapper::toDTO);
     }
 
@@ -42,7 +42,6 @@ public class ImagesServiceImp implements ImagesService {
                 .flatMapMany(
                         value -> filePartFlux.flatMap(cloudinaryService::uploadImageCloud).flatMap(secureUrl -> {
                             Images images = Images.builder()
-                                    .id(UUID.randomUUID().toString())
                                     .url(secureUrl)
                                     .fechaRegistro(LocalDate.now())
                                     .idTecnicoServicio(technicalServiceId)

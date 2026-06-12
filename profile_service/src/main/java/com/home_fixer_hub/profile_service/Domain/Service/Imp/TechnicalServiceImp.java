@@ -1,7 +1,6 @@
 package com.home_fixer_hub.profile_service.Domain.Service.Imp;
 
 import java.util.List;
-import java.util.UUID;
 
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
@@ -49,7 +48,6 @@ public class TechnicalServiceImp implements TechnicalService {
         return identityClient.isValidUser(technicalDTO.userId()).flatMap(isValid -> {
             if (isValid) {
                 Technical technical = technicalMapper.toEntity(technicalDTO);
-                technical.setId(UUID.randomUUID().toString());
                 technical.setDisponible(true);
                 return technicalRepository.save(technical).map(technicalMapper::toDTO);
             }
@@ -85,12 +83,16 @@ public class TechnicalServiceImp implements TechnicalService {
     public Mono<TechnicalDTO> changeAvailability(String technicalId) {
         return technicalRepository.findById(technicalId)
                 .switchIfEmpty(Mono.error(new RuntimeException("No se encontro el tecnico con el id: " + technicalId)))
-                .flatMap(technical -> technicalRepository.updateAvailability(technicalId, !technical.getDisponible())
+                .flatMap(technical -> {
+                    technical.setDisponible(!technical.getDisponible());
+                    return technicalRepository.save(technical);
+                }).map(technicalMapper::toDTO);
+                /* .flatMap(technical -> technicalRepository.updateAvailability(technicalId, !technical.getDisponible())
                         .then(Mono.fromCallable(() -> {
                             technical.setDisponible(!technical.getDisponible());
                             return technical;
-                        })))
-                .map(technicalMapper::toDTO);
+                        })))*/
+                
     }
 
     @Override

@@ -1,9 +1,9 @@
 package com.home_fixer_hub.profile_service.Persistense.Model;
 
 import org.springframework.data.annotation.Id;
-import org.springframework.data.annotation.Transient;
-import org.springframework.data.domain.Persistable;
 import org.springframework.data.relational.core.mapping.Table;
+
+import com.home_fixer_hub.profile_service.Persistense.Util.HasUuid;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -15,7 +15,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @Builder
 @AllArgsConstructor
-public class Technical implements Persistable<String> {
+public class Technical implements HasUuid {
     @Id
     private String id;
     private String nombre;
@@ -24,8 +24,4 @@ public class Technical implements Persistable<String> {
     private Boolean disponible;
     private String idUsuario;
     private String urlFotoPerfil;
-
-    @Transient
-    @Builder.Default
-    private boolean isNew = true;
 }

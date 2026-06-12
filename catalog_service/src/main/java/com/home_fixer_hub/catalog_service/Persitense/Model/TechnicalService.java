@@ -3,9 +3,9 @@ package com.home_fixer_hub.catalog_service.Persitense.Model;
 import java.math.BigDecimal;
 
 import org.springframework.data.annotation.Id;
-import org.springframework.data.annotation.Transient;
-import org.springframework.data.domain.Persistable;
 import org.springframework.data.relational.core.mapping.Table;
+
+import com.home_fixer_hub.catalog_service.Persitense.Utils.HasUuid;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -17,16 +17,11 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @Builder
 @AllArgsConstructor
-public class TechnicalService implements Persistable<String>{
+public class TechnicalService implements HasUuid {
     @Id
     private String id;
     private String idTecnico;
     private String idServicio;
     private String descripcion;
     private BigDecimal precioBase;
-
-    @Transient
-    @Builder.Default
-    private boolean isNew = true;
-
 }

@@ -21,6 +21,5 @@ public interface ImagesMapper {
     ImagesDTO toDTO(Images images);
 
     @InheritInverseConfiguration
-    @Mapping(target = "isNew", ignore = true)
     Images toEntity(ImagesDTO imagesDTO);
 }

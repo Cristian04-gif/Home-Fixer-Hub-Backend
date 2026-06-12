@@ -22,7 +22,6 @@ public interface TechnicalServiceMapper {
     TechnicalServiceDTO toDTO(TechnicalService technicalService);
 
     @InheritInverseConfiguration
-    @Mapping(target = "isNew", ignore = true)
     TechnicalService toEntity(TechnicalServiceDTO technicalServiceDTO);
 
     

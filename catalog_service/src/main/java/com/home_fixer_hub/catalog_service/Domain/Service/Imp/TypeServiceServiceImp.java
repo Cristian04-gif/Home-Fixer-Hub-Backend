@@ -1,13 +1,10 @@
 package com.home_fixer_hub.catalog_service.Domain.Service.Imp;
 
-import java.util.UUID;
-
 import org.springframework.stereotype.Service;
 
 import com.home_fixer_hub.catalog_service.Domain.DTO.TypeServiceDTO;
 import com.home_fixer_hub.catalog_service.Domain.Service.TypeServiceService;
 import com.home_fixer_hub.catalog_service.Persitense.Mapping.TypeServiceMapper;
-import com.home_fixer_hub.catalog_service.Persitense.Model.TypeService;
 import com.home_fixer_hub.catalog_service.Persitense.Repository.TechnicalServiceRepository;
 import com.home_fixer_hub.catalog_service.Persitense.Repository.TypeServiceRepository;
 
@@ -36,11 +33,7 @@ public class TypeServiceServiceImp implements TypeServiceService {
 
     @Override
     public Mono<TypeServiceDTO> register(TypeServiceDTO typeServiceDTO) {
-        return Mono.fromCallable((() -> {
-            TypeService typeService = typeServiceMapper.toEntity(typeServiceDTO);
-            typeService.setId(UUID.randomUUID().toString());
-            return typeService;
-        })).flatMap(typeServiceRepository::save).map(typeServiceMapper::toDTO)
+        return typeServiceRepository.save(typeServiceMapper.toEntity(typeServiceDTO)).map(typeServiceMapper::toDTO)
                 .switchIfEmpty(Mono.error(new RuntimeException("No se puedo register el tipo de servicio")));
     }
 

@@ -1,7 +1,6 @@
 package com.home_fixer_hub.profile_service.Domain.Service.Imp;
 
 import java.util.List;
-import java.util.UUID;
 
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
@@ -65,7 +64,6 @@ public class CustomerServiceImp implements CustomerService {
         return identityClient.isValidUser(customerDTO.userId()).flatMap(isValid -> {
             if (isValid) {
                 Customer customer = customerMapper.toEntity(customerDTO);
-                customer.setId(UUID.randomUUID().toString());
                 return customerRepository.save(customer).map(customerMapper::toDTO);
             }
             return Mono.error(new RuntimeException("usuario de identidad no encontrado"));

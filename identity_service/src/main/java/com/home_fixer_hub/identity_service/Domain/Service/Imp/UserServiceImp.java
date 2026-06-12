@@ -2,7 +2,6 @@ package com.home_fixer_hub.identity_service.Domain.Service.Imp;
 
 import java.time.LocalDate;
 import java.util.Base64;
-import java.util.UUID;
 
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -42,7 +41,6 @@ public class UserServiceImp implements UserService {
                 return Mono.error(new RuntimeException("El email ya esta registrado"));
             } else {
                 User user = userMapper.toEntity(userDTO);
-                user.setId(UUID.randomUUID().toString());
                 user.setFechaRegistro(LocalDate.now());
                 user.setContrasena(passwordEncoder.encode(userDTO.password()));
                 if (user.getEmail().endsWith("@tuapp.com")) {

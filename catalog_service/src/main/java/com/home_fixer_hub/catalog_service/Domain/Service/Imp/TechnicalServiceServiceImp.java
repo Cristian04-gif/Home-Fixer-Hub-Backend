@@ -1,7 +1,6 @@
 package com.home_fixer_hub.catalog_service.Domain.Service.Imp;
 
 import java.util.List;
-import java.util.UUID;
 
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
@@ -40,7 +39,6 @@ public class TechnicalServiceServiceImp implements TechnicalServiceService {
         public Mono<TechnicalServiceDTO> assignSkill(TechnicalServiceDTO technicalServiceDTO) {
                 return profileClient.getTechnicalById(technicalServiceDTO.technicalId()).flatMap(profile -> {
                         TechnicalService service = TechnicalService.builder()
-                                        .id(UUID.randomUUID().toString())
                                         .idTecnico(technicalServiceDTO.technicalId())
                                         .idServicio(technicalServiceDTO.serviceId())
                                         .descripcion(technicalServiceDTO.description())
