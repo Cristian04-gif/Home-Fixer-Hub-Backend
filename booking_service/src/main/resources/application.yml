@@ -1,0 +1,40 @@
+server:
+  port: 8084
+
+spring:
+  application:
+    name: booking-service
+  #Configuración de R2DBC para MySQL
+  r2dbc:
+    url: r2dbc:mysql://${DB_HOST:localhost}:${DB_PORT:3306}/${DB_NAME:ms_booking}
+    username: root
+    password: root
+    pool:
+      enabled: true
+      initial-size: 5
+      max-size: 10
+
+  # Configuración del servidor WebFlux
+  codec:
+    max-in-memory-size: 10MB
+  cloud:
+    config:
+      enabled: false
+
+# Opcional: Para ver las consultas SQL en consola
+logging:
+  level:
+    org.springframework.r2dbc: DEBUG
+
+eureka:
+  client:
+    service-url:
+      defaultZone: http://${EUREKA_HOST:localhost}:${EUREKA_PORT:8761}/eureka/ # Aquí le avisa a Eureka que existe
+
+google:
+  maps:
+    api-key: "AIzaSyCQl6FfHCVwHcZbjaifXaa8mQKAJ1ZARss"
+
+services:
+  profile-service:
+    url: http://PROFILE-SERVICE

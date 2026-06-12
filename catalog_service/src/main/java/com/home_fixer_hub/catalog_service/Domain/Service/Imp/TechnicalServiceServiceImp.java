@@ -58,7 +58,23 @@ public class TechnicalServiceServiceImp implements TechnicalServiceService {
 
                 Mono<List<TechnicalDTO>> technicals = repository
                                 .findAllByIdServicio(serviceId, PageRequest.of(pageNumber, pageSize))
-                                .flatMap(value -> profileClient.getTechnicalById(value.getIdTecnico())).collectList();
+                                .flatMap(value -> profileClient.getTechnicalById(value.getIdTecnico())
+                                                .map(technical -> {
+                                                        TechnicalDTO technicalDTO = TechnicalDTO.builder()
+                                                                        .id(technical.getId())
+                                                                        .name(technical.getName())
+                                                                        .lastName(technical.getLastName())
+                                                                        .dni(technical.getDni())
+                                                                        .available(technical.getAvailable())
+                                                                        .userId(technical.getUserId())
+                                                                        .urlPhotoProfile(technical.getUrlPhotoProfile())
+                                                                        .averageRating(technical.getAverageRating())
+                                                                        .description(value.getDescripcion())
+                                                                        .priceBase(value.getPrecioBase())
+                                                                        .build();
+                                                        return technicalDTO;
+                                                }))
+                                .collectList();
 
                 Mono<Long> count = repository.countByIdServicio(serviceId);
 
@@ -105,7 +121,7 @@ public class TechnicalServiceServiceImp implements TechnicalServiceService {
                                 .switchIfEmpty(Mono.error(
                                                 new RuntimeException("No se encontro al tecnico " + technicalId)))
                                 .flatMapMany(technical -> {
-                                        return repository.findAllByIdTecnico(technical.id())
+                                        return repository.findAllByIdTecnico(technical.getId())
                                                         .flatMap(value -> serviceRepository
                                                                         .findById(value.getIdServicio())
                                                                         .map(serviceMapper::toDTO));
@@ -114,8 +130,9 @@ public class TechnicalServiceServiceImp implements TechnicalServiceService {
 
         @Override
         public Mono<Void> removeSkill(String technical, String serviceId) {
-                return repository.findByIdTecnicoAndIdServicio(technical, serviceId).switchIfEmpty(Mono.error(new RuntimeException(
-                                "No se pudo eliminar la relacion del tecnico con el servicio")))
+                return repository.findByIdTecnicoAndIdServicio(technical, serviceId)
+                                .switchIfEmpty(Mono.error(new RuntimeException(
+                                                "No se pudo eliminar la relacion del tecnico con el servicio")))
                                 .flatMap(value -> {
                                         imagesRepository.deleteAllByIdTecnicoServicio(value.getId());
                                         return repository.delete(value);

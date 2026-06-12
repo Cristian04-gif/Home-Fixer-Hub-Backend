@@ -49,6 +49,7 @@ public class TechnicalServiceImp implements TechnicalService {
             if (isValid) {
                 Technical technical = technicalMapper.toEntity(technicalDTO);
                 technical.setDisponible(true);
+                technical.setValoracionPromedio(0.00);
                 return technicalRepository.save(technical).map(technicalMapper::toDTO);
             }
             return Mono.error(new RuntimeException("Usuario de identidad no encontrado"));

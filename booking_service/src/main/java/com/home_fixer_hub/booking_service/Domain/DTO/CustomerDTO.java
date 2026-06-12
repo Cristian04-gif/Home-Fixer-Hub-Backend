@@ -1,4 +1,4 @@
-package com.home_fixer_hub.profile_service.Domain.DTO;
+package com.home_fixer_hub.booking_service.Domain.DTO;
 
 public record CustomerDTO(
     String id,

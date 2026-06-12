@@ -55,8 +55,9 @@ public class CustomerServiceImp implements CustomerService {
 
     @Override
     public Mono<CustomerDTO> getById(String customerId) {
-        return customerRepository.findById(customerId).map(customerMapper::toDTO)
-                .switchIfEmpty(Mono.error(new RuntimeException("No se encontro el cliente")));
+        return customerRepository.findById(customerId)
+                .switchIfEmpty(Mono.error(new RuntimeException("No se encontro el cliente")))
+                .map(customerMapper::toDTO);
     }
 
     @Override
@@ -64,6 +65,7 @@ public class CustomerServiceImp implements CustomerService {
         return identityClient.isValidUser(customerDTO.userId()).flatMap(isValid -> {
             if (isValid) {
                 Customer customer = customerMapper.toEntity(customerDTO);
+                customer.setValoracionPromedio(0.00);
                 return customerRepository.save(customer).map(customerMapper::toDTO);
             }
             return Mono.error(new RuntimeException("usuario de identidad no encontrado"));
@@ -82,8 +84,7 @@ public class CustomerServiceImp implements CustomerService {
         return customerRepository.findById(customerId)
                 .switchIfEmpty(Mono.error(new RuntimeException("No se encontro el id de cliente: " + customerId)))
                 .flatMap(customer -> filePartMono.flatMap(cloudinaryService::uploadImageCloud)
-                        .flatMap(secureUrl ->
-                        customerRepository.updatePhotoProfile(customerId, secureUrl)
+                        .flatMap(secureUrl -> customerRepository.updatePhotoProfile(customerId, secureUrl)
                                 .then(Mono.fromCallable(() -> {
                                     customer.setUrlFotoPerfil(secureUrl);
                                     return customer;

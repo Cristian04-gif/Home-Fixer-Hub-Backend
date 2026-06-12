@@ -23,4 +23,5 @@ public class Customer implements HasUuid {
     private String dni;
     private String idUsuario;
     private String urlFotoPerfil;
+    private Double valoracionPromedio;
 }

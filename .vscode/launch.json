@@ -74,6 +74,16 @@
             "projectName": "review_service",
             "args": "",
             "envFile": "${workspaceFolder}/.env"
+        },
+        {
+            "type": "java",
+            "name": "Spring Boot-BookingServiceApplication<booking_service>",
+            "request": "launch",
+            "cwd": "${workspaceFolder}",
+            "mainClass": "com.home_fixer_hub.booking_service.BookingServiceApplication",
+            "projectName": "booking_service",
+            "args": "",
+            "envFile": "${workspaceFolder}/.env"
         }
     ]
 }

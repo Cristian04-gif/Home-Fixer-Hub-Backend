@@ -24,4 +24,5 @@ public class Technical implements HasUuid {
     private Boolean disponible;
     private String idUsuario;
     private String urlFotoPerfil;
+    private Double valoracionPromedio;
 }

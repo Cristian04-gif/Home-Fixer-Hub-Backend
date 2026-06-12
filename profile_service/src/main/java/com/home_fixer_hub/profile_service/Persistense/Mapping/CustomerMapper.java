@@ -17,7 +17,8 @@ public interface CustomerMapper {
         @Mapping(source = "apellido", target = "lastName"),
         @Mapping(source = "dni", target = "dni"),
         @Mapping(source = "idUsuario", target = "userId"),
-        @Mapping(source = "urlFotoPerfil", target = "urlPhotoProfile")
+        @Mapping(source = "urlFotoPerfil", target = "urlPhotoProfile"),
+        @Mapping(source = "valoracionPromedio", target = "averageRating")
     })
 
     CustomerDTO toDTO(Customer customer);
