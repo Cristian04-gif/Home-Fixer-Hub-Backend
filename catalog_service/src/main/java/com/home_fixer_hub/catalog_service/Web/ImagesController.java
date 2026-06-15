@@ -1,6 +1,5 @@
 package com.home_fixer_hub.catalog_service.Web;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.codec.multipart.FilePart;
@@ -12,6 +11,7 @@ import org.springframework.web.bind.annotation.RestController;
 import com.home_fixer_hub.catalog_service.Domain.DTO.ImagesDTO;
 import com.home_fixer_hub.catalog_service.Domain.Service.ImagesService;
 
+import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import reactor.core.publisher.Flux;
 
@@ -22,10 +22,10 @@ import org.springframework.web.bind.annotation.PostMapping;
 @RestController
 @Log4j2
 @RequestMapping("/api/catalog/images")
+@RequiredArgsConstructor
 public class ImagesController {
 
-    @Autowired
-    private ImagesService imagesService;
+    private final ImagesService imagesService;
 
     @GetMapping("/public/technical-service/{technicalServiceId}")
     public Flux<ImagesDTO> getImagesByTechnicalServiceId(@PathVariable String technicalServiceId) {

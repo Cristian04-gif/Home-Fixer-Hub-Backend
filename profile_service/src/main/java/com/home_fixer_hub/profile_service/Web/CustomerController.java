@@ -1,6 +1,5 @@
 package com.home_fixer_hub.profile_service.Web;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -13,6 +12,7 @@ import com.home_fixer_hub.profile_service.Domain.DTO.Response.AllCustomerDTO;
 import com.home_fixer_hub.profile_service.Domain.Service.CustomerService;
 import com.home_fixer_hub.profile_service.Persistense.Util.Pagination;
 
+import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import reactor.core.publisher.Mono;
 
@@ -27,10 +27,10 @@ import org.springframework.web.bind.annotation.RequestHeader;
 @RestController
 @Log4j2
 @RequestMapping("/api/profile/customers")
+@RequiredArgsConstructor
 public class CustomerController {
 
-    @Autowired
-    private CustomerService customerService;
+    private final CustomerService customerService;
 
     @GetMapping("")
     public Mono<ResponseEntity<AllCustomerDTO>> getAll(

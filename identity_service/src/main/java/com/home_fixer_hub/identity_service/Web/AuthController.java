@@ -1,6 +1,5 @@
 package com.home_fixer_hub.identity_service.Web;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -11,6 +10,7 @@ import com.home_fixer_hub.identity_service.Domain.DTO.Request.AuthRequest;
 import com.home_fixer_hub.identity_service.Domain.DTO.Response.AuthResponse;
 import com.home_fixer_hub.identity_service.Domain.Service.UserService;
 
+import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import reactor.core.publisher.Mono;
 
@@ -23,10 +23,10 @@ import org.springframework.web.bind.annotation.RequestHeader;
 @RestController
 @Log4j2
 @RequestMapping("/api/auth")
+@RequiredArgsConstructor
 public class AuthController {
 
-    @Autowired
-    private UserService userService;
+    private final UserService userService;
 
     @PostMapping("/login")
     public Mono<ResponseEntity<AuthResponse>> login(@RequestBody AuthRequest authRequest) {

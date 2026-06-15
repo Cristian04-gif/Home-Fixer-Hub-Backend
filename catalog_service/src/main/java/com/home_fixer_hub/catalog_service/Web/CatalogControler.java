@@ -1,6 +1,5 @@
 package com.home_fixer_hub.catalog_service.Web;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -10,6 +9,7 @@ import com.home_fixer_hub.catalog_service.Domain.DTO.Response.AllTechnicalDTO;
 import com.home_fixer_hub.catalog_service.Domain.Service.TechnicalServiceService;
 import com.home_fixer_hub.catalog_service.Persitense.Utils.Pagination;
 
+import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import reactor.core.publisher.Mono;
 
@@ -20,10 +20,10 @@ import org.springframework.web.bind.annotation.RequestParam;
 @RestController
 @Log4j2
 @RequestMapping("/api/catalog")
+@RequiredArgsConstructor
 public class CatalogControler {
 
-    @Autowired
-    private TechnicalServiceService service;
+    private final TechnicalServiceService service;
 
     @GetMapping("/public/service/{serviceId}/tecnicals")
     public Mono<ResponseEntity<AllTechnicalDTO>> getTechniciansPerService(@PathVariable String serviceId,

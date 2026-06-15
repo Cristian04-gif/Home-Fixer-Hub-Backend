@@ -10,6 +10,7 @@ import com.home_fixer_hub.catalog_service.Domain.DTO.TechnicalDTO;
 import com.home_fixer_hub.catalog_service.Domain.DTO.TechnicalServiceDTO;
 import com.home_fixer_hub.catalog_service.Domain.DTO.TypeServiceDTO;
 import com.home_fixer_hub.catalog_service.Domain.DTO.Response.AllTechnicalDTO;
+import com.home_fixer_hub.catalog_service.Domain.DTO.Response.TechnicalSkills;
 import com.home_fixer_hub.catalog_service.Domain.Service.TechnicalServiceService;
 import com.home_fixer_hub.catalog_service.Persitense.Mapping.TechnicalServiceMapper;
 import com.home_fixer_hub.catalog_service.Persitense.Mapping.TypeServiceMapper;
@@ -116,19 +117,6 @@ public class TechnicalServiceServiceImp implements TechnicalServiceService {
         }
 
         @Override
-        public Flux<TypeServiceDTO> getTechnicianServices(String technicalId) {
-                return profileClient.getTechnicalById(technicalId)
-                                .switchIfEmpty(Mono.error(
-                                                new RuntimeException("No se encontro al tecnico " + technicalId)))
-                                .flatMapMany(technical -> {
-                                        return repository.findAllByIdTecnico(technical.getId())
-                                                        .flatMap(value -> serviceRepository
-                                                                        .findById(value.getIdServicio())
-                                                                        .map(serviceMapper::toDTO));
-                                });
-        }
-
-        @Override
         public Mono<Void> removeSkill(String technical, String serviceId) {
                 return repository.findByIdTecnicoAndIdServicio(technical, serviceId)
                                 .switchIfEmpty(Mono.error(new RuntimeException(
@@ -137,6 +125,35 @@ public class TechnicalServiceServiceImp implements TechnicalServiceService {
                                         imagesRepository.deleteAllByIdTecnicoServicio(value.getId());
                                         return repository.delete(value);
                                 });
+        }
+
+        @Override
+        public Flux<TechnicalSkills> getTechnicianServices(String technicalId) {
+                Mono<TechnicalDTO> technical = profileClient.getTechnicalById(technicalId)
+                                .switchIfEmpty(Mono.error(
+                                                new RuntimeException("No se encontro al tecnico " + technicalId)));
+
+                Flux<TypeServiceDTO> services = repository.findAllByIdTecnico(technicalId)
+                                .flatMap(value -> serviceRepository.findById(value.getIdServicio()))
+                                .map(serviceMapper::toDTO);
+
+                Flux<TechnicalServiceDTO> ts = repository.findAllByIdTecnico(technicalId).map(mapper::toDTO);
+                
+                return Flux.zip(technical, services, ts).flatMap(tuple ->{
+                        TechnicalSkills skills = TechnicalSkills.builder()
+                        .id(tuple.getT3().id())
+                        .serviceId(tuple.getT2().id())
+                        .technicalId(technicalId)
+                        .nameService(tuple.getT2().name())
+                        .iconService(tuple.getT2().icon())
+                        .description(tuple.getT3().description())
+                        .basePrice(tuple.getT3().basePrice())
+                        .available(tuple.getT1().getAvailable())
+                        .build();
+
+                        return Mono.just(skills);
+                });
+
         }
 
 }

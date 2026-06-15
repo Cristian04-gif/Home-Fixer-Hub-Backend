@@ -15,13 +15,13 @@ import reactor.netty.http.client.HttpClient;
 public class GeocodingService {
 
     private final WebClient webClient;
-    private final ObjectMapper objectMapper; // Manejador manual de JSON
+    private final ObjectMapper objectMapper; 
 
     @Value("${google.maps.api-key}")
     private String apiKey;
 
     public GeocodingService() {
-        this.objectMapper = new ObjectMapper(); // Inicializa el mapper compatible
+        this.objectMapper = new ObjectMapper();
         this.webClient = WebClient.builder()
                 .clientConnector(new ReactorClientHttpConnector(HttpClient.create().secure()))
                 .baseUrl("https://maps.googleapis.com")
