@@ -13,6 +13,7 @@ public interface TechnicalServiceMapper {
 
     @Mappings({
         @Mapping(source = "id", target = "id"),
+        @Mapping(source = "nombre", target = "name"),
         @Mapping(source = "idTecnico", target = "technicalId"),
         @Mapping(source = "idServicio", target = "serviceId"),
         @Mapping(source = "descripcion", target = "description"),

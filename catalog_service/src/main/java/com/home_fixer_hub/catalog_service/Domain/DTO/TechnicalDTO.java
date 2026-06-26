@@ -1,6 +1,9 @@
 package com.home_fixer_hub.catalog_service.Domain.DTO;
 
 import java.math.BigDecimal;
+import java.util.List;
+
+import com.home_fixer_hub.catalog_service.Domain.DTO.Response.TechnicalServiceResponse;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -22,6 +25,8 @@ public class TechnicalDTO {
         private String urlPhotoProfile;
         private Double averageRating;
         private String description;
-        private BigDecimal priceBase;
+        private BigDecimal price;
+        private List<TechnicalServiceResponse> servicesOffered;
+        private List<String> urlImages;
 
 }

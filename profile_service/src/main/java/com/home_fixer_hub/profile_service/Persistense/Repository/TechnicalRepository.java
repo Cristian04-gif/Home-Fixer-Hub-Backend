@@ -15,7 +15,7 @@ import reactor.core.publisher.Mono;
 public interface TechnicalRepository extends ReactiveCrudRepository<Technical, String> {
     Flux<Technical> findAllBy(Pageable pageable);
 
-    Flux<Technical> findAllByDisponibleTrue(Pageable pageable);
+    Flux<Technical> findAllByDisponibleTrue();
 
     Mono<Technical> findByIdUsuario(String idUsuario);
 

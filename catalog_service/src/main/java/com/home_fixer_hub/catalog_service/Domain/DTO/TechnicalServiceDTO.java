@@ -4,6 +4,7 @@ import java.math.BigDecimal;
 
 public record TechnicalServiceDTO(
     String id,
+    String name,
     String technicalId,
     String serviceId,
     String description,

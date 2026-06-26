@@ -1,6 +1,5 @@
 package com.home_fixer_hub.catalog_service.Persitense.Repository;
 
-import org.springframework.data.domain.Pageable;
 import org.springframework.data.repository.reactive.ReactiveCrudRepository;
 import org.springframework.stereotype.Repository;
 
@@ -13,9 +12,9 @@ import reactor.core.publisher.Mono;
 public interface TechnicalServiceRepository extends ReactiveCrudRepository<TechnicalService, String> {
     Flux<TechnicalService> findAllByIdTecnico(String idTecnico);
 
-    Flux<TechnicalService> findAllByIdServicio(String idServicio, Pageable pageable);
+    Flux<TechnicalService> findAllByIdServicio(String idServicio);
 
-    Mono<TechnicalService> findByIdTecnicoAndIdServicio(String idTecnico, String idServicio);
+    Flux<TechnicalService> findByIdTecnicoAndIdServicio(String idTecnico, String idServicio);
 
     Mono<Long> countByIdServicio(String idServicio);
 

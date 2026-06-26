@@ -8,18 +8,16 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.home_fixer_hub.profile_service.Domain.DTO.TechnicalDTO;
-import com.home_fixer_hub.profile_service.Domain.DTO.Response.AllTechnicalDTO;
 import com.home_fixer_hub.profile_service.Domain.Service.TechnicalService;
-import com.home_fixer_hub.profile_service.Persistense.Util.Pagination;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
+import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -71,12 +69,13 @@ public class TechnicalController {
 
     @PutMapping("/fixer/{technicalId}/availability")
     public Mono<ResponseEntity<TechnicalDTO>> changeAvailability(@PathVariable String technicalId) {
-        return technicalService.changeAvailability(technicalId).map(value -> ResponseEntity.ok(value)).onErrorResume(e ->{
-            log.error("No se pudo actualizar el estado del tecnico {}", e);
-            return Mono.just(ResponseEntity.notFound().build());
-        });
+        return technicalService.changeAvailability(technicalId).map(value -> ResponseEntity.ok(value))
+                .onErrorResume(e -> {
+                    log.error("No se pudo actualizar el estado del tecnico {}", e);
+                    return Mono.just(ResponseEntity.notFound().build());
+                });
     }
-    
+
     @GetMapping("/fixer/user/{userId}")
     public Mono<ResponseEntity<TechnicalDTO>> getByUserId(@PathVariable String userId) {
         return technicalService.getByuserId(userId).map(value -> ResponseEntity.ok(value)).onErrorResume(e -> {
@@ -93,20 +92,16 @@ public class TechnicalController {
     // tecnicos cercanos
     // top tecnicos
 
-    /////////////////////////////
+    ///////////////////////////
 
     @GetMapping("")
-    public Mono<ResponseEntity<AllTechnicalDTO>> getAll(
-            @RequestParam(defaultValue = Pagination.PAGE_NUMBER, required = false) int pageNumber,
-            @RequestParam(defaultValue = Pagination.PAGE_SIZE, required = false) int pageSize) {
-        return technicalService.getAll(pageNumber, pageSize).map(value -> ResponseEntity.ok().body(value));
+    public Flux<TechnicalDTO> getAll() {
+        return technicalService.getAll();
     }
 
     @GetMapping("/available")
-    public Mono<ResponseEntity<AllTechnicalDTO>> getAllAvailable(
-            @RequestParam(defaultValue = Pagination.PAGE_NUMBER, required = false) int pageNumber,
-            @RequestParam(defaultValue = Pagination.PAGE_SIZE, required = false) int pageSize) {
-        return technicalService.getAllAvailable(pageNumber, pageSize).map(value -> ResponseEntity.ok(value));
+    public Flux<TechnicalDTO> getAllAvailable() {
+        return technicalService.getAllAvailable();
     }
 
 }

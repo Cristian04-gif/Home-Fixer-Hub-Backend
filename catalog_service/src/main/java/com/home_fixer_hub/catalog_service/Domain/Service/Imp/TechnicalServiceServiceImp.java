@@ -2,18 +2,15 @@ package com.home_fixer_hub.catalog_service.Domain.Service.Imp;
 
 import java.util.List;
 
-import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 
 import com.home_fixer_hub.catalog_service.Domain.Client.ProfileClient;
 import com.home_fixer_hub.catalog_service.Domain.DTO.TechnicalDTO;
 import com.home_fixer_hub.catalog_service.Domain.DTO.TechnicalServiceDTO;
-import com.home_fixer_hub.catalog_service.Domain.DTO.TypeServiceDTO;
-import com.home_fixer_hub.catalog_service.Domain.DTO.Response.AllTechnicalDTO;
+import com.home_fixer_hub.catalog_service.Domain.DTO.Response.TechnicalServiceResponse;
 import com.home_fixer_hub.catalog_service.Domain.DTO.Response.TechnicalSkills;
 import com.home_fixer_hub.catalog_service.Domain.Service.TechnicalServiceService;
 import com.home_fixer_hub.catalog_service.Persitense.Mapping.TechnicalServiceMapper;
-import com.home_fixer_hub.catalog_service.Persitense.Mapping.TypeServiceMapper;
 import com.home_fixer_hub.catalog_service.Persitense.Model.TechnicalService;
 import com.home_fixer_hub.catalog_service.Persitense.Repository.ImagesRepository;
 import com.home_fixer_hub.catalog_service.Persitense.Repository.TechnicalServiceRepository;
@@ -32,7 +29,7 @@ public class TechnicalServiceServiceImp implements TechnicalServiceService {
         private final ProfileClient profileClient;
 
         private final TypeServiceRepository serviceRepository;
-        private final TypeServiceMapper serviceMapper;
+        // private final TypeServiceMapper serviceMapper;
 
         private final ImagesRepository imagesRepository;
 
@@ -40,6 +37,7 @@ public class TechnicalServiceServiceImp implements TechnicalServiceService {
         public Mono<TechnicalServiceDTO> assignSkill(TechnicalServiceDTO technicalServiceDTO) {
                 return profileClient.getTechnicalById(technicalServiceDTO.technicalId()).flatMap(profile -> {
                         TechnicalService service = TechnicalService.builder()
+                                        .nombre(technicalServiceDTO.name())
                                         .idTecnico(technicalServiceDTO.technicalId())
                                         .idServicio(technicalServiceDTO.serviceId())
                                         .descripcion(technicalServiceDTO.description())
@@ -52,49 +50,57 @@ public class TechnicalServiceServiceImp implements TechnicalServiceService {
         }
 
         @Override
-        public Mono<AllTechnicalDTO> getTechnicalsByService(String serviceId, int pageNumber, int pageSize) {
+        public Flux<TechnicalDTO> getTechnicalsByService(String serviceId) {
+                return serviceRepository.findById(serviceId)
+                                .switchIfEmpty(Mono.error(new RuntimeException("No se encontró ese servicio")))
+                                .flatMapMany(service -> repository.findAllByIdServicio(service.getId()))
+                                .flatMap(value -> {
 
-                Mono<TypeServiceDTO> service = serviceRepository.findById(serviceId).map(serviceMapper::toDTO)
-                                .switchIfEmpty(Mono.error(new RuntimeException("No se encontro el servicio")));
+                                        Mono<List<String>> imagesMono = imagesRepository
+                                                        .findAllByIdTecnicoServicio(value.getId())
+                                                        .map(img -> img.getUrl())
+                                                        .collectList();
 
-                Mono<List<TechnicalDTO>> technicals = repository
-                                .findAllByIdServicio(serviceId, PageRequest.of(pageNumber, pageSize))
-                                .flatMap(value -> profileClient.getTechnicalById(value.getIdTecnico())
-                                                .map(technical -> {
-                                                        TechnicalDTO technicalDTO = TechnicalDTO.builder()
-                                                                        .id(technical.getId())
-                                                                        .name(technical.getName())
-                                                                        .lastName(technical.getLastName())
-                                                                        .dni(technical.getDni())
-                                                                        .available(technical.getAvailable())
-                                                                        .userId(technical.getUserId())
-                                                                        .urlPhotoProfile(technical.getUrlPhotoProfile())
-                                                                        .averageRating(technical.getAverageRating())
-                                                                        .description(value.getDescripcion())
-                                                                        .priceBase(value.getPrecioBase())
-                                                                        .build();
-                                                        return technicalDTO;
-                                                }))
-                                .collectList();
+                                        Mono<TechnicalDTO> profileMono = profileClient
+                                                        .getTechnicalById(value.getIdTecnico());
 
-                Mono<Long> count = repository.countByIdServicio(serviceId);
+                                        Mono<List<TechnicalServiceResponse>> servicesOffered = profileMono
+                                                        .flatMapMany(tech -> repository.findByIdTecnicoAndIdServicio(
+                                                                        tech.getId(), serviceId))
+                                                        .map(so -> {
+                                                                TechnicalServiceResponse response = TechnicalServiceResponse
+                                                                                .builder()
+                                                                                .id(so.getId())
+                                                                                .name(so.getNombre())
+                                                                                .serviceId(so.getIdServicio())
+                                                                                .basePrice(so.getPrecioBase())
+                                                                                .build();
+                                                                return response;
+                                                        }).collectList();
 
-                return Mono.zip(service, technicals, count).map(tuple -> {
-                        TypeServiceDTO typeService = tuple.getT1();
-                        List<TechnicalDTO> list = tuple.getT2();
-                        long totalElements = tuple.getT3();
-                        int totalPages = (int) Math.ceil((double) totalElements / pageSize);
-                        boolean last = pageNumber >= totalPages - 1;
-                        return AllTechnicalDTO.builder()
-                                        .service(typeService)
-                                        .technicals(list)
-                                        .pageNumber(pageNumber)
-                                        .pageSize(totalElements > 0 ? pageSize : 0)
-                                        .totalElements(totalElements)
-                                        .totalPages(totalPages)
-                                        .last(last)
-                                        .build();
-                });
+                                        return Mono.zip(imagesMono, profileMono, servicesOffered)
+                                                        .map(tuple -> {
+                                                                List<String> urlsImagenes = tuple.getT1();
+                                                                TechnicalDTO tech = tuple.getT2();
+                                                                List<TechnicalServiceResponse> namesService = tuple
+                                                                                .getT3();
+                                                                return TechnicalDTO.builder()
+                                                                                .id(tech.getId())
+                                                                                .name(tech.getName())
+                                                                                .lastName(tech.getLastName())
+                                                                                .dni(tech.getDni())
+                                                                                .available(tech.getAvailable())
+                                                                                .userId(tech.getUserId())
+                                                                                .urlPhotoProfile(tech
+                                                                                                .getUrlPhotoProfile())
+                                                                                .averageRating(tech.getAverageRating())
+                                                                                .description(value.getDescripcion())
+                                                                                .price(value.getPrecioBase())
+                                                                                .servicesOffered(namesService)
+                                                                                .urlImages(urlsImagenes)
+                                                                                .build();
+                                                        });
+                                });
         }
 
         @Override
@@ -109,7 +115,7 @@ public class TechnicalServiceServiceImp implements TechnicalServiceService {
         }
 
         @Override
-        public Mono<TechnicalServiceDTO> getByTecnicalIdAndServiceId(String technicalId, String serviceId) {
+        public Flux<TechnicalServiceDTO> getByTecnicalIdAndServiceId(String technicalId, String serviceId) {
                 return repository.findByIdTecnicoAndIdServicio(technicalId, serviceId).map(mapper::toDTO)
                                 .switchIfEmpty(Mono.error(new RuntimeException(
                                                 "No se encontro la informacion relaicionada con el tecnico: "
@@ -117,8 +123,8 @@ public class TechnicalServiceServiceImp implements TechnicalServiceService {
         }
 
         @Override
-        public Mono<Void> removeSkill(String technical, String serviceId) {
-                return repository.findByIdTecnicoAndIdServicio(technical, serviceId)
+        public Mono<Void> removeSkill(String technicalServiceId) {
+                return repository.findById(technicalServiceId)
                                 .switchIfEmpty(Mono.error(new RuntimeException(
                                                 "No se pudo eliminar la relacion del tecnico con el servicio")))
                                 .flatMap(value -> {
@@ -129,31 +135,27 @@ public class TechnicalServiceServiceImp implements TechnicalServiceService {
 
         @Override
         public Flux<TechnicalSkills> getTechnicianServices(String technicalId) {
-                Mono<TechnicalDTO> technical = profileClient.getTechnicalById(technicalId)
-                                .switchIfEmpty(Mono.error(
-                                                new RuntimeException("No se encontro al tecnico " + technicalId)));
 
-                Flux<TypeServiceDTO> services = repository.findAllByIdTecnico(technicalId)
-                                .flatMap(value -> serviceRepository.findById(value.getIdServicio()))
-                                .map(serviceMapper::toDTO);
+                Mono<TechnicalDTO> technicalMono = profileClient.getTechnicalById(technicalId)
+                                .switchIfEmpty(
+                                                Mono.error(new RuntimeException(
+                                                                "No se encontró al técnico " + technicalId)));
 
-                Flux<TechnicalServiceDTO> ts = repository.findAllByIdTecnico(technicalId).map(mapper::toDTO);
-                
-                return Flux.zip(technical, services, ts).flatMap(tuple ->{
-                        TechnicalSkills skills = TechnicalSkills.builder()
-                        .id(tuple.getT3().id())
-                        .serviceId(tuple.getT2().id())
-                        .technicalId(technicalId)
-                        .nameService(tuple.getT2().name())
-                        .iconService(tuple.getT2().icon())
-                        .description(tuple.getT3().description())
-                        .basePrice(tuple.getT3().basePrice())
-                        .available(tuple.getT1().getAvailable())
-                        .build();
-
-                        return Mono.just(skills);
-                });
-
+                return technicalMono.flatMapMany(technical -> repository.findAllByIdTecnico(technicalId)
+                                .flatMap(technicalService -> serviceRepository
+                                                .findById(technicalService.getIdServicio())
+                                                .map(typeService -> TechnicalSkills.builder()
+                                                                .id(technicalService.getId())
+                                                                .serviceId(typeService.getId())
+                                                                .technicalId(technicalId)
+                                                                .typeService(typeService.getNombre())
+                                                                .nameService(technicalService.getNombre())
+                                                                .iconService(typeService.getIcono())
+                                                                .description(technicalService.getDescripcion())
+                                                                .basePrice(technicalService.getPrecioBase())
+                                                                .available(technical.getAvailable())
+                                                                .price(technicalService.getPrecioBase())
+                                                                .build())));
         }
 
 }

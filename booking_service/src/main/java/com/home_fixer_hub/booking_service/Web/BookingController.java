@@ -3,9 +3,11 @@ package com.home_fixer_hub.booking_service.Web;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.home_fixer_hub.booking_service.Domain.DTO.BookingDTO;
+import com.home_fixer_hub.booking_service.Domain.DTO.Response.BookingResponseTech;
 import com.home_fixer_hub.booking_service.Domain.Service.BookingService;
 
 import lombok.RequiredArgsConstructor;
@@ -54,8 +56,8 @@ public class BookingController {
     }
 
     @GetMapping("/fixer/{technicalId}")
-    public Flux<BookingDTO> queriesForTechnician(@PathVariable String technicalId) {
-        return bookingService.getQuestionsTheTechnician(technicalId);
+    public Flux<BookingResponseTech> queriesForTechnician(@PathVariable String technicalId, @RequestParam Double lat1, @RequestParam Double lon1) {
+        return bookingService.getQuestionsTheTechnician(technicalId, lat1, lon1);
     }
 
     @PutMapping("/{bookingId}/fixer/accept")

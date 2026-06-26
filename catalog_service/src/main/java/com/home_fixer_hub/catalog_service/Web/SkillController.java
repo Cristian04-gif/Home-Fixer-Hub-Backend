@@ -6,7 +6,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.home_fixer_hub.catalog_service.Domain.DTO.TechnicalServiceDTO;
-import com.home_fixer_hub.catalog_service.Domain.DTO.TypeServiceDTO;
 import com.home_fixer_hub.catalog_service.Domain.DTO.Response.TechnicalSkills;
 import com.home_fixer_hub.catalog_service.Domain.Service.TechnicalServiceService;
 
@@ -38,9 +37,9 @@ public class SkillController {
                 });
     }
 
-    @DeleteMapping("/remove/fixer/{technicalId}/service/{serviceId}")
-    public Mono<ResponseEntity<Void>> removeSkill(@PathVariable String technicalId, @PathVariable String serviceId) {
-        return service.removeSkill(technicalId, serviceId).map(value -> ResponseEntity.noContent().build());
+    @DeleteMapping("/remove/fixer/technical-service/{technicalServiceId}")
+    public Mono<ResponseEntity<Void>> removeSkill(@PathVariable String technicalServiceId) {
+        return service.removeSkill(technicalServiceId).map(value -> ResponseEntity.noContent().build());
     }
 
     @GetMapping("/fixer/technical/{technicalId}")

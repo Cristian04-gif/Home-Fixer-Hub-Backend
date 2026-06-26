@@ -1,6 +1,7 @@
 package com.home_fixer_hub.booking_service.Domain.Service;
 
 import com.home_fixer_hub.booking_service.Domain.DTO.BookingDTO;
+import com.home_fixer_hub.booking_service.Domain.DTO.Response.BookingResponseTech;
 
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
@@ -13,7 +14,7 @@ public interface BookingService {
 
     public Flux<BookingDTO> getCustomerInquiries(String customerId);
 
-    public Flux<BookingDTO> getQuestionsTheTechnician(String technicalId);
+    public Flux<BookingResponseTech> getQuestionsTheTechnician(String technicalId, Double lat1, Double lon1);
 
     public Mono<BookingDTO> acceptQuery(String bookingId);
 

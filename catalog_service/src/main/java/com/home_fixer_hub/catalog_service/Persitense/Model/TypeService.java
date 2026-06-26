@@ -20,5 +20,6 @@ public class TypeService implements HasUuid {
     private String id;
     private String nombre;
     private String icono;
+    private String descripcion;
 
 }

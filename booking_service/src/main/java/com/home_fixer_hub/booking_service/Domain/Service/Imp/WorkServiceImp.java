@@ -1,5 +1,7 @@
 package com.home_fixer_hub.booking_service.Domain.Service.Imp;
 
+import java.time.LocalDateTime;
+
 import org.springframework.stereotype.Service;
 
 import com.home_fixer_hub.booking_service.Domain.Client.CustomerClient;
@@ -50,6 +52,7 @@ public class WorkServiceImp implements WorkService {
                 .switchIfEmpty(Mono.error(new RuntimeException("No se encontro un trabajo con el id: " + bookingId)))
                 .flatMap(booking -> {
                     booking.setEstadoConsulta(BookingStatus.EN_PROCESO.name());
+                    booking.setFechaModificacion(LocalDateTime.now());
                     return bookingRepository.save(booking);
                 }).map(bookingMapper::toDTO);
     }
@@ -60,6 +63,7 @@ public class WorkServiceImp implements WorkService {
                 .switchIfEmpty(Mono.error(new RuntimeException("No se encontro un trabajo con el id: " + bookingId)))
                 .flatMap(booking -> {
                     booking.setEstadoConsulta(BookingStatus.FINALIZADA.name());
+                    booking.setFechaModificacion(LocalDateTime.now());
                     return bookingRepository.save(booking);
                 }).map(bookingMapper::toDTO);
     }
@@ -70,6 +74,7 @@ public class WorkServiceImp implements WorkService {
                 .switchIfEmpty(Mono.error(new RuntimeException("No se encontro un trabajo con el id: " + bookingId)))
                 .flatMap(booking -> {
                     booking.setEstadoConsulta(BookingStatus.CANCELADO.name());
+                    booking.setFechaModificacion(LocalDateTime.now());
                     return bookingRepository.save(booking);
                 }).map(bookingMapper::toDTO);
     }

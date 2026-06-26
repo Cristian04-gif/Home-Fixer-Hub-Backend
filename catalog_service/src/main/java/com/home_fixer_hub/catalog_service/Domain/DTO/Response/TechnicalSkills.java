@@ -12,9 +12,11 @@ public class TechnicalSkills {
     private String id;
     private String serviceId;
     private String technicalId;
-    private String nameService;
+    private String typeService;
     private String iconService;
+    private String nameService;
     private String description;
     private BigDecimal basePrice;
     private Boolean available;
+    private BigDecimal price;
 }

@@ -3,18 +3,15 @@ package com.home_fixer_hub.booking_service.Domain.Service.Imp;
 import org.springframework.stereotype.Service;
 
 import com.home_fixer_hub.booking_service.Domain.Client.TechnicalClient;
-import com.home_fixer_hub.booking_service.Domain.DTO.BookingDTO;
 import com.home_fixer_hub.booking_service.Domain.DTO.DashboardTechnical;
 import com.home_fixer_hub.booking_service.Domain.DTO.TechnicalDTO;
 import com.home_fixer_hub.booking_service.Domain.Service.BookingService;
 import com.home_fixer_hub.booking_service.Domain.Service.DashboardService;
 import com.home_fixer_hub.booking_service.Persistense.Mapping.BookingMapper;
-import com.home_fixer_hub.booking_service.Persistense.Model.Booking;
 import com.home_fixer_hub.booking_service.Persistense.Model.BookingStatus;
 import com.home_fixer_hub.booking_service.Persistense.Repository.BookingRepository;
 
 import lombok.RequiredArgsConstructor;
-import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 @Service
@@ -33,11 +30,9 @@ public class DashboardServiceImp implements DashboardService {
                                 .switchIfEmpty(Mono.error(new RuntimeException(
                                                 "No se encontro al tecnico con el id: " + technicalId)));
 
-                System.out.println("tecnico");
                 Mono<Long> pendingQueries = bookingRepository.countByIdTecnicoAndEstadoConsulta(technicalId,
                                 BookingStatus.PENDIENTE.toString())
                                 .switchIfEmpty(Mono.just(0L));
-                System.out.println("pendientes");
                 Mono<Long> aceeptQueries = bookingRepository.countByIdTecnicoAndEstadoConsulta(technicalId,
                                 BookingStatus.ACEPTADA.toString())
                                 .switchIfEmpty(Mono.just(0L));
@@ -45,17 +40,15 @@ public class DashboardServiceImp implements DashboardService {
                 Mono<Long> processRequests = bookingRepository.countByIdTecnicoAndEstadoConsulta(technicalId,
                                 BookingStatus.EN_PROCESO.toString())
                                 .switchIfEmpty(Mono.just(0L));
-                System.out.println("en proceso");
                 Mono<Long> completeRequests = bookingRepository.countByIdTecnicoAndEstadoConsulta(technicalId,
                                 BookingStatus.FINALIZADA.toString())
                                 .switchIfEmpty(Mono.just(0L));
-                System.out.println("finalizadas");
-                return Mono.zip(technical, aceeptQueries, pendingQueries, processRequests, completeRequests)
+                return Mono.zip(technical, pendingQueries, aceeptQueries, processRequests, completeRequests)
                                 .flatMap(tuple -> {
                                         DashboardTechnical dashboardTechnical = DashboardTechnical.builder()
                                                         .pendingQueries(tuple.getT2())
-                                                        .processRequests(tuple.getT3() + tuple.getT2())
-                                                        .completeRequests(tuple.getT4())
+                                                        .processRequests(tuple.getT3() + tuple.getT4())
+                                                        .completeRequests(tuple.getT5())
                                                         .averageRanking(tuple.getT1().averageRating())
                                                         .available(tuple.getT1().available())
                                                         .build();

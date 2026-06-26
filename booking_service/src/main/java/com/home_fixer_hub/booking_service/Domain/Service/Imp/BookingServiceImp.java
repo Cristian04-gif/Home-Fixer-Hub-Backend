@@ -9,11 +9,13 @@ import com.home_fixer_hub.booking_service.Domain.Client.TechnicalClient;
 import com.home_fixer_hub.booking_service.Domain.DTO.BookingDTO;
 import com.home_fixer_hub.booking_service.Domain.DTO.CustomerDTO;
 import com.home_fixer_hub.booking_service.Domain.DTO.TechnicalDTO;
+import com.home_fixer_hub.booking_service.Domain.DTO.Response.BookingResponseTech;
 import com.home_fixer_hub.booking_service.Domain.Service.BookingService;
 import com.home_fixer_hub.booking_service.Persistense.Mapping.BookingMapper;
 import com.home_fixer_hub.booking_service.Persistense.Model.Booking;
 import com.home_fixer_hub.booking_service.Persistense.Model.BookingStatus;
 import com.home_fixer_hub.booking_service.Persistense.Repository.BookingRepository;
+import com.home_fixer_hub.booking_service.Persistense.Utils.LocationUtils;
 
 import lombok.RequiredArgsConstructor;
 import reactor.core.publisher.Flux;
@@ -55,6 +57,7 @@ public class BookingServiceImp implements BookingService {
                                         booking.setDireccionDetallada(direccionTexto);
                                         booking.setEstadoConsulta(BookingStatus.PENDIENTE.name());
                                         booking.setFechaConsulta(LocalDateTime.now());
+                                        booking.setFechaModificacion(LocalDateTime.now());
                                         return bookingRepository.save(booking);
                                 }).map(bookingMapper::toDTO);
         }
@@ -78,12 +81,41 @@ public class BookingServiceImp implements BookingService {
         }
 
         @Override
-        public Flux<BookingDTO> getQuestionsTheTechnician(String technicalId) {
+        public Flux<BookingResponseTech> getQuestionsTheTechnician(String technicalId, Double lat1, Double lon1) {
+
+                if (lat1 == null && lon1 == null) {
+                        return Flux.error(new IllegalArgumentException(
+                                        "No se ingresó la ubicación de consulta del técnico"));
+                }
+
                 return technicalClient.getTechnicalById(technicalId)
-                                .flatMapMany(technical -> bookingRepository.findByIdTecnico(technical.id()))
-                                .switchIfEmpty(Mono.error(
-                                                new RuntimeException("NO se encontro consultas para ese tecnico")))
-                                .map(bookingMapper::toDTO);
+                                .switchIfEmpty(Mono.error(new RuntimeException(
+                                                "No se encontró el técnico con el id " + technicalId)))
+                                .flatMapMany(technicalDTO -> bookingRepository.findByIdTecnico(technicalId).filter(
+                                                tech -> tech.getEstadoConsulta().equals(BookingStatus.PENDIENTE.name()))
+                                                .map(booking -> {
+
+                                                        double distance = LocationUtils.calculateDistance(
+                                                                        lat1, lon1,
+                                                                        booking.getLatitud(), booking.getLongitud());
+
+                                                        return BookingResponseTech.builder()
+                                                                        .id(booking.getId())
+                                                                        .serviceType(booking.getTipoServicio())
+                                                                        .title(booking.getTitulo())
+                                                                        .description(booking.getDescripcion())
+                                                                        .inquiryDate(booking.getFechaConsulta())
+                                                                        .latitudeCustomer(booking.getLatitud())
+                                                                        .longitudeCustomer(booking.getLongitud())
+                                                                        .detailedAddress(
+                                                                                        booking.getDireccionDetallada())
+                                                                        .distanceKm(distance)
+                                                                        .totalAmount(booking.getMontoTotal())
+                                                                        .inquiryStatus(booking.getEstadoConsulta())
+                                                                        .customerId(booking.getIdCliente())
+                                                                        .technicalId(technicalId)
+                                                                        .build();
+                                                }));
         }
 
         @Override
@@ -94,7 +126,9 @@ public class BookingServiceImp implements BookingService {
                                                                 "No se encontro la solicitud de servicios con el id: "
                                                                                 + bookingId)))
                                 .flatMap(booking -> {
+
                                         booking.setEstadoConsulta(BookingStatus.ACEPTADA.name());
+                                        booking.setFechaModificacion(LocalDateTime.now());
                                         return bookingRepository.save(booking);
                                 }).map(bookingMapper::toDTO);
         }
@@ -108,6 +142,7 @@ public class BookingServiceImp implements BookingService {
                                                                                 + bookingId)))
                                 .flatMap(booking -> {
                                         booking.setEstadoConsulta(BookingStatus.RECHAZADA.name());
+                                        booking.setFechaModificacion(LocalDateTime.now());
                                         return bookingRepository.save(booking);
                                 }).then();
         }
@@ -121,6 +156,7 @@ public class BookingServiceImp implements BookingService {
                                                                                 + bookingId)))
                                 .flatMap(booking -> {
                                         booking.setEstadoConsulta(BookingStatus.CANCELADO.name());
+                                        booking.setFechaModificacion(LocalDateTime.now());
                                         return bookingRepository.save(booking);
                                 }).then();
         }

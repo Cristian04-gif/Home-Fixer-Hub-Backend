@@ -1,16 +1,11 @@
 package com.home_fixer_hub.profile_service.Domain.Service.Imp;
 
-import java.util.List;
-
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Sort;
 import org.springframework.http.codec.multipart.FilePart;
 import org.springframework.stereotype.Service;
 
 import com.home_fixer_hub.profile_service.Domain.Client.CatalogClient;
 import com.home_fixer_hub.profile_service.Domain.Client.IdentityClient;
 import com.home_fixer_hub.profile_service.Domain.DTO.TechnicalDTO;
-import com.home_fixer_hub.profile_service.Domain.DTO.Response.AllTechnicalDTO;
 import com.home_fixer_hub.profile_service.Domain.Service.CloudinaryService;
 import com.home_fixer_hub.profile_service.Domain.Service.TechnicalService;
 import com.home_fixer_hub.profile_service.Persistense.Mapping.TechnicalMapper;
@@ -18,6 +13,7 @@ import com.home_fixer_hub.profile_service.Persistense.Model.Technical;
 import com.home_fixer_hub.profile_service.Persistense.Repository.TechnicalRepository;
 
 import lombok.RequiredArgsConstructor;
+import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 @Service
@@ -88,12 +84,15 @@ public class TechnicalServiceImp implements TechnicalService {
                     technical.setDisponible(!technical.getDisponible());
                     return technicalRepository.save(technical);
                 }).map(technicalMapper::toDTO);
-                /* .flatMap(technical -> technicalRepository.updateAvailability(technicalId, !technical.getDisponible())
-                        .then(Mono.fromCallable(() -> {
-                            technical.setDisponible(!technical.getDisponible());
-                            return technical;
-                        })))*/
-                
+        /*
+         * .flatMap(technical -> technicalRepository.updateAvailability(technicalId,
+         * !technical.getDisponible())
+         * .then(Mono.fromCallable(() -> {
+         * technical.setDisponible(!technical.getDisponible());
+         * return technical;
+         * })))
+         */
+
     }
 
     @Override
@@ -106,57 +105,18 @@ public class TechnicalServiceImp implements TechnicalService {
                 .switchIfEmpty(Mono.error(new RuntimeException("No se encontor el tecnico con el id: " + technicalId)));
     }
 
-    ////////////////////////////
+    ///////////////////////////
 
     @Override
-    public Mono<AllTechnicalDTO> getAll(int page, int size) {
+    public Flux<TechnicalDTO>  getAll() {
 
-        Mono<List<TechnicalDTO>> technicals = technicalRepository
-                .findAllBy(PageRequest.of(page, size, Sort.by("id").ascending())).map(technicalMapper::toDTO)
-                .collectList();
-
-        Mono<Long> count = technicalRepository.count();
-
-        return Mono.zip(technicals, count).map(tuple -> {
-            List<TechnicalDTO> list = tuple.getT1();
-            long totalElements = tuple.getT2();
-            int totalPages = (int) Math.ceil((double) totalElements / size);
-            boolean last = page >= totalPages - 1;
-            return AllTechnicalDTO.builder()
-                    .technicalDTOs(list)
-                    .pageNumber(page)
-                    .pageSize(totalElements > 0 ? size : 0)
-                    .totalElements(totalElements)
-                    .totalPages(totalPages)
-                    .last(last)
-                    .build();
-        });
+        return technicalRepository.findAll().map(technicalMapper::toDTO);
 
     }
 
     @Override
-    public Mono<AllTechnicalDTO> getAllAvailable(int pageNumber, int pageSize) {
+    public Flux<TechnicalDTO> getAllAvailable() {
 
-        Mono<List<TechnicalDTO>> technicals = technicalRepository
-                .findAllByDisponibleTrue(PageRequest.of(pageNumber, pageSize, Sort.by("id").ascending()))
-                .map(technicalMapper::toDTO)
-                .collectList();
-
-        Mono<Long> count = technicalRepository.count();
-
-        return Mono.zip(technicals, count).map(tuple -> {
-            List<TechnicalDTO> list = tuple.getT1();
-            long totalElements = tuple.getT2();
-            int totalPages = (int) Math.ceil((double) totalElements / pageSize);
-            boolean last = pageNumber >= totalPages - 1;
-            return AllTechnicalDTO.builder()
-                    .technicalDTOs(list)
-                    .pageNumber(pageNumber)
-                    .pageSize(totalElements > 0 ? pageSize : 0)
-                    .totalElements(totalElements)
-                    .totalPages(totalPages)
-                    .last(last)
-                    .build();
-        });
+        return technicalRepository.findAllByDisponibleTrue().map(technicalMapper::toDTO);
     }
 }

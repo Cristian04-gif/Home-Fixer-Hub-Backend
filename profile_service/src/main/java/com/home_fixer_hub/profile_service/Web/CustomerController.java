@@ -26,7 +26,7 @@ import org.springframework.web.bind.annotation.RequestHeader;
 
 @RestController
 @Log4j2
-@RequestMapping("/api/profile/customers")
+@RequestMapping("/api/profile/clients")
 @RequiredArgsConstructor
 public class CustomerController {
 

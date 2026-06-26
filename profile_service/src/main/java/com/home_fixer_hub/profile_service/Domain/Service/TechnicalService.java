@@ -3,8 +3,8 @@ package com.home_fixer_hub.profile_service.Domain.Service;
 import org.springframework.http.codec.multipart.FilePart;
 
 import com.home_fixer_hub.profile_service.Domain.DTO.TechnicalDTO;
-import com.home_fixer_hub.profile_service.Domain.DTO.Response.AllTechnicalDTO;
 
+import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 public interface TechnicalService {
@@ -26,8 +26,8 @@ public interface TechnicalService {
     ///////////////////////////////////
     /// 
     
-    public Mono<AllTechnicalDTO> getAll(int page, int size);
+    public Flux<TechnicalDTO> getAll();
 
-    public Mono<AllTechnicalDTO> getAllAvailable(int pageNumber, int pageSize);
+    public Flux<TechnicalDTO> getAllAvailable();
 
 }

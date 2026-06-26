@@ -6,6 +6,7 @@ import java.time.LocalDateTime;
 public record BookingDTO(
         String id,
         String serviceType,
+        String title,
         String description,
         LocalDateTime inquiryDate,
         Double latitude,
@@ -13,6 +14,7 @@ public record BookingDTO(
         String detailedAddress,
         BigDecimal totalAmount,
         String inquiryStatus,
+        String modificationDate,
         String customerId,
         String technicalId) {
 

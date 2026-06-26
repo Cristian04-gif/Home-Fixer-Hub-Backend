@@ -17,6 +17,7 @@ public class Booking implements HasUuid{
     @Id
     private String id;
     private String tipoServicio;
+    private String titulo;
     private String descripcion;
     private LocalDateTime fechaConsulta;
     private Double latitud;
@@ -24,6 +25,7 @@ public class Booking implements HasUuid{
     private String direccionDetallada;
     private BigDecimal montoTotal;
     private String estadoConsulta;
+    private LocalDateTime fechaModificacion;
     private String idCliente;
     private String idTecnico;
 }

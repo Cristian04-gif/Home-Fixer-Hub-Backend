@@ -14,6 +14,7 @@ public interface BookingMapper {
     @Mappings({
             @Mapping(source = "id", target = "id"),
             @Mapping(source = "tipoServicio", target = "serviceType"),
+            @Mapping(source = "titulo", target = "title"),
             @Mapping(source = "descripcion", target = "description"),
             @Mapping(source = "fechaConsulta", target = "inquiryDate"),
             @Mapping(source = "latitud", target = "latitude"),
@@ -21,8 +22,10 @@ public interface BookingMapper {
             @Mapping(source = "direccionDetallada", target = "detailedAddress"),
             @Mapping(source = "montoTotal", target = "totalAmount"),
             @Mapping(source = "estadoConsulta", target = "inquiryStatus"),
+            @Mapping(source = "fechaModificacion", target = "modificationDate"),
             @Mapping(source = "idCliente", target = "customerId"),
             @Mapping(source = "idTecnico", target = "technicalId"),
+            
     })
 
     BookingDTO toDTO(Booking booking);

@@ -20,6 +20,7 @@ import lombok.NoArgsConstructor;
 public class TechnicalService implements HasUuid {
     @Id
     private String id;
+    private String nombre;
     private String idTecnico;
     private String idServicio;
     private String descripcion;

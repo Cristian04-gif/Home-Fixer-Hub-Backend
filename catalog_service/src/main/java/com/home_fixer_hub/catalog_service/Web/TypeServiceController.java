@@ -6,6 +6,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.home_fixer_hub.catalog_service.Domain.DTO.TypeServiceDTO;
+import com.home_fixer_hub.catalog_service.Domain.DTO.Response.TypeServiceResponse;
 import com.home_fixer_hub.catalog_service.Domain.Service.TypeServiceService;
 
 import lombok.RequiredArgsConstructor;
@@ -30,8 +31,8 @@ public class TypeServiceController {
     private final TypeServiceService typeServiceService;
 
     @GetMapping("/public/services")
-    public ResponseEntity<Flux<TypeServiceDTO>> getAll() {
-        return new ResponseEntity<>(typeServiceService.getAll(), HttpStatus.OK);
+    public Flux<TypeServiceResponse> getAll() {
+        return typeServiceService.getAll();
     }
 
     @GetMapping("/public/service/{typeServiceId}")
@@ -44,7 +45,8 @@ public class TypeServiceController {
     }
 
     @PostMapping("/admin/service")
-    public Mono<ResponseEntity<TypeServiceDTO>> register(@RequestHeader("Authorization") String auth,@RequestBody TypeServiceDTO typeServiceDTO) {
+    public Mono<ResponseEntity<TypeServiceDTO>> register(@RequestHeader("Authorization") String auth,
+            @RequestBody TypeServiceDTO typeServiceDTO) {
         System.out.println(auth);
         return typeServiceService.register(typeServiceDTO)
                 .map(value -> ResponseEntity.status(HttpStatus.CREATED).body(value))

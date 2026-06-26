@@ -3,6 +3,7 @@ package com.home_fixer_hub.catalog_service.Domain.Service.Imp;
 import org.springframework.stereotype.Service;
 
 import com.home_fixer_hub.catalog_service.Domain.DTO.TypeServiceDTO;
+import com.home_fixer_hub.catalog_service.Domain.DTO.Response.TypeServiceResponse;
 import com.home_fixer_hub.catalog_service.Domain.Service.TypeServiceService;
 import com.home_fixer_hub.catalog_service.Persitense.Mapping.TypeServiceMapper;
 import com.home_fixer_hub.catalog_service.Persitense.Repository.TechnicalServiceRepository;
@@ -21,8 +22,19 @@ public class TypeServiceServiceImp implements TypeServiceService {
     private final TypeServiceMapper typeServiceMapper;
 
     @Override
-    public Flux<TypeServiceDTO> getAll() {
-        return typeServiceRepository.findAll().map(typeServiceMapper::toDTO);
+    public Flux<TypeServiceResponse> getAll() {
+        return typeServiceRepository.findAll()
+                .flatMap(service -> technicalServiceRepository.countByIdServicio(service.getId()).flatMap(value -> {
+                    TypeServiceResponse response = TypeServiceResponse.builder()
+                            .id(service.getId())
+                            .name(service.getNombre())
+                            .description(service.getDescripcion())
+                            .techNum(value)
+                            .build();
+
+                    return Mono.just(response);
+                }));
+
     }
 
     @Override
