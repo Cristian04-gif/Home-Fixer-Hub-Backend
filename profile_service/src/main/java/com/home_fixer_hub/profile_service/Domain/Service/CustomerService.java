@@ -12,6 +12,7 @@ public interface CustomerService {
     public Mono<AllCustomerDTO> getAll(int page, int size);
     public Mono<CustomerDTO> getById(String customerId);
     public Mono<CustomerDTO> register(CustomerDTO customerDTO);
+    public Mono<Void> updatePushToken(String customerId, String pushToken);
     public Mono<CustomerDTO> uploadPhotoProfile(String customerId, Mono<FilePart> filePartMono);
     public Mono<CustomerDTO> getByUserId(String userId);
 }

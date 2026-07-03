@@ -11,6 +11,7 @@ import com.home_fixer_hub.booking_service.Domain.DTO.CustomerDTO;
 import com.home_fixer_hub.booking_service.Domain.DTO.TechnicalDTO;
 import com.home_fixer_hub.booking_service.Domain.DTO.Response.BookingResponseTech;
 import com.home_fixer_hub.booking_service.Domain.Service.BookingService;
+import com.home_fixer_hub.booking_service.Domain.Service.NotificationService;
 import com.home_fixer_hub.booking_service.Persistense.Mapping.BookingMapper;
 import com.home_fixer_hub.booking_service.Persistense.Model.Booking;
 import com.home_fixer_hub.booking_service.Persistense.Model.BookingStatus;
@@ -30,6 +31,7 @@ public class BookingServiceImp implements BookingService {
         private final GeocodingService geocodingService;
         private final CustomerClient customerClient;
         private final TechnicalClient technicalClient;
+        private final NotificationService notificationService;
 
         @Override
         public Mono<BookingDTO> register(BookingDTO bookingDTO) {
@@ -59,7 +61,10 @@ public class BookingServiceImp implements BookingService {
                                         booking.setFechaConsulta(LocalDateTime.now());
                                         booking.setFechaModificacion(LocalDateTime.now());
                                         return bookingRepository.save(booking);
-                                }).map(bookingMapper::toDTO);
+                                })
+                                .doOnNext(book -> notificationService.sendNotificationRequest(book.getIdCliente(),
+                                                book.getIdTecnico(), book.getEstadoConsulta(), book.getTipoServicio()))
+                                .map(bookingMapper::toDTO);
         }
 
         @Override
@@ -76,7 +81,6 @@ public class BookingServiceImp implements BookingService {
         public Flux<BookingDTO> getCustomerInquiries(String customerId) {
                 return customerClient.getCustomerId(customerId)
                                 .flatMapMany(customer -> bookingRepository.findByIdCliente(customer.id()))
-                                .filter(bookings -> bookings.getEstadoConsulta().equals(BookingStatus.PENDIENTE.name()))
                                 .map(bookingMapper::toDTO);
         }
 
@@ -130,7 +134,8 @@ public class BookingServiceImp implements BookingService {
                                         booking.setEstadoConsulta(BookingStatus.ACEPTADA.name());
                                         booking.setFechaModificacion(LocalDateTime.now());
                                         return bookingRepository.save(booking);
-                                }).map(bookingMapper::toDTO);
+                                }).doOnNext(book -> notificationService.sendNotificationRequest(book.getIdCliente(),
+                                                book.getIdTecnico(), book.getEstadoConsulta(), book.getTipoServicio())).map(bookingMapper::toDTO);
         }
 
         @Override
@@ -144,7 +149,8 @@ public class BookingServiceImp implements BookingService {
                                         booking.setEstadoConsulta(BookingStatus.RECHAZADA.name());
                                         booking.setFechaModificacion(LocalDateTime.now());
                                         return bookingRepository.save(booking);
-                                }).then();
+                                }).doOnNext(book -> notificationService.sendNotificationRequest(book.getIdCliente(),
+                                                book.getIdTecnico(), book.getEstadoConsulta(), book.getTipoServicio())).then();
         }
 
         @Override
@@ -158,7 +164,8 @@ public class BookingServiceImp implements BookingService {
                                         booking.setEstadoConsulta(BookingStatus.CANCELADO.name());
                                         booking.setFechaModificacion(LocalDateTime.now());
                                         return bookingRepository.save(booking);
-                                }).then();
+                                }).doOnNext(book -> notificationService.sendNotificationRequest(book.getIdCliente(),
+                                                book.getIdTecnico(), book.getEstadoConsulta(), book.getTipoServicio())).then();
         }
 
 }

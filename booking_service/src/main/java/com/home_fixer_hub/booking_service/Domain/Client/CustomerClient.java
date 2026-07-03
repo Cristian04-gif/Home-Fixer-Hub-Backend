@@ -20,7 +20,7 @@ public class CustomerClient {
 
     public Mono<CustomerDTO> getCustomerId(String customerId) {
         return webClient.get()
-                .uri("/api/profile/customers/{customerId}", customerId)
+                .uri("/api/profile/clients/{customerId}", customerId)
                 .retrieve()
                 .bodyToMono(CustomerDTO.class);
     }

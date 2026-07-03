@@ -8,6 +8,7 @@ public record TechnicalDTO(
         Boolean available,
         String userId,
         String urlPhotoProfile,
-        Double averageRating) {
+        Double averageRating,
+        String pushToken) {
 
 }

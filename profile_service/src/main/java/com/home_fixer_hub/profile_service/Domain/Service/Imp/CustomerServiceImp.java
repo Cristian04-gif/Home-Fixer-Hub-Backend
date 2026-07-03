@@ -92,4 +92,14 @@ public class CustomerServiceImp implements CustomerService {
                 .map(customerMapper::toDTO);
     }
 
+    @Override
+    public Mono<Void> updatePushToken(String customerId, String pushToken) {
+        return customerRepository.findById(customerId)
+                .switchIfEmpty(Mono.error(new RuntimeException("No se encontro el cliente con el id " + customerId)))
+                .map(customer -> {
+                    customer.setPushToken(pushToken);
+                    return customerRepository.save(customer);
+                }).then();
+    }
+
 }

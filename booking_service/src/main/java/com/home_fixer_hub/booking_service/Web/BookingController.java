@@ -46,12 +46,8 @@ public class BookingController {
     }
 
     @GetMapping("/customer/{customerId}")
-    public Flux<ResponseEntity<BookingDTO>> customerinquiries(@PathVariable String customerId) {
-        return bookingService.getCustomerInquiries(customerId).map(value -> ResponseEntity.ok(value))
-                .onErrorResume(e -> {
-                    log.error("No se encontro la consulta {}", e);
-                    return Mono.just(ResponseEntity.notFound().build());
-                });
+    public Flux<BookingDTO> customerinquiries(@PathVariable String customerId) {
+        return bookingService.getCustomerInquiries(customerId);
 
     }
 

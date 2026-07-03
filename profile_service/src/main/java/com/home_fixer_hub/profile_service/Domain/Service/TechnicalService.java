@@ -22,6 +22,8 @@ public interface TechnicalService {
     public Mono<TechnicalDTO> changeAvailability(String technicalId);
 
     public Mono<Void> deleteById(String technicalId);
+
+    public Mono<Void> updatePushToken(String technicalId, String pushToken);
     
     ///////////////////////////////////
     /// 

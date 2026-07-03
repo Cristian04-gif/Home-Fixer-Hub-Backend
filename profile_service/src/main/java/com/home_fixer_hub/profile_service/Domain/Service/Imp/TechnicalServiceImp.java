@@ -105,10 +105,10 @@ public class TechnicalServiceImp implements TechnicalService {
                 .switchIfEmpty(Mono.error(new RuntimeException("No se encontor el tecnico con el id: " + technicalId)));
     }
 
-    ///////////////////////////
+    //////////////////////////
 
     @Override
-    public Flux<TechnicalDTO>  getAll() {
+    public Flux<TechnicalDTO> getAll() {
 
         return technicalRepository.findAll().map(technicalMapper::toDTO);
 
@@ -118,5 +118,15 @@ public class TechnicalServiceImp implements TechnicalService {
     public Flux<TechnicalDTO> getAllAvailable() {
 
         return technicalRepository.findAllByDisponibleTrue().map(technicalMapper::toDTO);
+    }
+
+    @Override
+    public Mono<Void> updatePushToken(String technicalId, String pushToken) {
+        return technicalRepository.findById(technicalId)
+                .switchIfEmpty(Mono.error(new RuntimeException("No se encontro el tecnico con el id " + technicalId)))
+                .flatMap(tech -> {
+                    tech.setPushToken(pushToken);
+                    return technicalRepository.save(tech);
+                }).then();
     }
 }

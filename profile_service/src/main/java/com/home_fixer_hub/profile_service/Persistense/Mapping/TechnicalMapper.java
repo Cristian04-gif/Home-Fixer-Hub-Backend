@@ -19,7 +19,8 @@ public interface TechnicalMapper {
             @Mapping(source = "disponible", target = "available"),
             @Mapping(source = "idUsuario", target = "userId"),
             @Mapping(source = "urlFotoPerfil", target = "urlPhotoProfile"),
-            @Mapping(source = "valoracionPromedio", target = "averageRating")
+            @Mapping(source = "valoracionPromedio", target = "averageRating"),
+            @Mapping(source = "pushToken", target = "pushToken")
     })
 
     TechnicalDTO toDTO(Technical technical);

@@ -7,7 +7,8 @@ public record CustomerDTO(
     String dni,
     String userId,
     String urlPhotoProfile,
-    Double averageRating
+    Double averageRating,
+    String pushToken
 ) {
 
 }

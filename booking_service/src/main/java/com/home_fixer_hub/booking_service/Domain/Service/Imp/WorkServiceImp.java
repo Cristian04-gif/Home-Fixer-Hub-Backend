@@ -7,6 +7,7 @@ import org.springframework.stereotype.Service;
 import com.home_fixer_hub.booking_service.Domain.Client.CustomerClient;
 import com.home_fixer_hub.booking_service.Domain.Client.TechnicalClient;
 import com.home_fixer_hub.booking_service.Domain.DTO.BookingDTO;
+import com.home_fixer_hub.booking_service.Domain.Service.NotificationService;
 import com.home_fixer_hub.booking_service.Domain.Service.WorkService;
 import com.home_fixer_hub.booking_service.Persistense.Mapping.BookingMapper;
 import com.home_fixer_hub.booking_service.Persistense.Model.BookingStatus;
@@ -24,6 +25,7 @@ public class WorkServiceImp implements WorkService {
     private final BookingMapper bookingMapper;
     private final CustomerClient customerClient;
     private final TechnicalClient technicalClient;
+    private final NotificationService notificationService;
 
     @Override
     public Mono<BookingDTO> getWork(String bookingId) {
@@ -54,7 +56,12 @@ public class WorkServiceImp implements WorkService {
                     booking.setEstadoConsulta(BookingStatus.EN_PROCESO.name());
                     booking.setFechaModificacion(LocalDateTime.now());
                     return bookingRepository.save(booking);
-                }).map(bookingMapper::toDTO);
+                }).flatMap(book -> notificationService.sendNotificationRequest(
+                        book.getIdCliente(),
+                        book.getIdTecnico(),
+                        book.getEstadoConsulta(),
+                        book.getTipoServicio()).thenReturn(book)) 
+                .map(bookingMapper::toDTO);
     }
 
     @Override
@@ -65,7 +72,9 @@ public class WorkServiceImp implements WorkService {
                     booking.setEstadoConsulta(BookingStatus.FINALIZADA.name());
                     booking.setFechaModificacion(LocalDateTime.now());
                     return bookingRepository.save(booking);
-                }).map(bookingMapper::toDTO);
+                }).doOnNext(book -> notificationService.sendNotificationRequest(book.getIdCliente(),
+                        book.getIdTecnico(), book.getEstadoConsulta(), book.getTipoServicio()))
+                .map(bookingMapper::toDTO);
     }
 
     @Override
@@ -76,7 +85,9 @@ public class WorkServiceImp implements WorkService {
                     booking.setEstadoConsulta(BookingStatus.CANCELADO.name());
                     booking.setFechaModificacion(LocalDateTime.now());
                     return bookingRepository.save(booking);
-                }).map(bookingMapper::toDTO);
+                }).doOnNext(book -> notificationService.sendNotificationRequest(book.getIdCliente(),
+                        book.getIdTecnico(), book.getEstadoConsulta(), book.getTipoServicio()))
+                .map(bookingMapper::toDTO);
     }
 
 }
