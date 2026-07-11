@@ -18,7 +18,7 @@ public class JwtService {
 
     public String generateToken(String username, String role, String userId) {
         Map<String, Object> claims = new HashMap<>();
-        claims.put("role", role); // Agregamos el rol (ej. "ROLE_CLIENT" o "ROLE_TECHNICAL")
+        claims.put("role", role); 
         claims.put("userId", userId);
         return createToken(claims, username);
     }
@@ -28,7 +28,7 @@ public class JwtService {
                 .setClaims(claims)
                 .setSubject(userName)
                 .setIssuedAt(new Date(System.currentTimeMillis()))
-                .setExpiration(new Date(System.currentTimeMillis() + 1000 * 60 * 60 * 24)) // 1 hora
+                .setExpiration(new Date(System.currentTimeMillis() + 1000 * 60 * 60 * 24))
                 .signWith(getSignKey(), SignatureAlgorithm.HS256).compact();
     }
 

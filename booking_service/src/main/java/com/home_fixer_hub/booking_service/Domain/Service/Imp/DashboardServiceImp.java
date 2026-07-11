@@ -5,9 +5,7 @@ import org.springframework.stereotype.Service;
 import com.home_fixer_hub.booking_service.Domain.Client.TechnicalClient;
 import com.home_fixer_hub.booking_service.Domain.DTO.DashboardTechnical;
 import com.home_fixer_hub.booking_service.Domain.DTO.TechnicalDTO;
-import com.home_fixer_hub.booking_service.Domain.Service.BookingService;
 import com.home_fixer_hub.booking_service.Domain.Service.DashboardService;
-import com.home_fixer_hub.booking_service.Persistense.Mapping.BookingMapper;
 import com.home_fixer_hub.booking_service.Persistense.Model.BookingStatus;
 import com.home_fixer_hub.booking_service.Persistense.Repository.BookingRepository;
 
@@ -20,12 +18,10 @@ public class DashboardServiceImp implements DashboardService {
 
         private final TechnicalClient technicalClient;
         private final BookingRepository bookingRepository;
-        private final BookingService bookingService;
-        private final BookingMapper bookingMapper;
+
 
         @Override
         public Mono<DashboardTechnical> dashboardTechnical(String technicalId) {
-                System.out.println("dhasboard tecnico");
                 Mono<TechnicalDTO> technical = technicalClient.getTechnicalById(technicalId)
                                 .switchIfEmpty(Mono.error(new RuntimeException(
                                                 "No se encontro al tecnico con el id: " + technicalId)));

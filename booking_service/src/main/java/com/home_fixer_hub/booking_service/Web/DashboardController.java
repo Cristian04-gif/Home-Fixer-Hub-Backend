@@ -24,7 +24,6 @@ public class DashboardController {
 
     @GetMapping("/fixer/{technicalId}")
     public Mono<ResponseEntity<DashboardTechnical>> dahsboardtechnical(@PathVariable String technicalId) {
-        System.out.println("controlador");
         return dashboardService.dashboardTechnical(technicalId).map(value -> ResponseEntity.ok(value))
                 .onErrorResume(e -> {
                     log.error("no se pudo tener el dashboar del tecnico, {}", e);

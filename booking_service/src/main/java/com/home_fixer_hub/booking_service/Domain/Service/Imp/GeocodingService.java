@@ -15,7 +15,7 @@ import reactor.netty.http.client.HttpClient;
 public class GeocodingService {
 
     private final WebClient webClient;
-    private final ObjectMapper objectMapper; 
+    private final ObjectMapper objectMapper;
 
     @Value("${google.maps.api-key}")
     private String apiKey;
@@ -38,28 +38,29 @@ public class GeocodingService {
                         .queryParam("key", apiKey)
                         .build())
                 .retrieve()
-                .bodyToMono(String.class) 
+                .bodyToMono(String.class)
                 .map(jsonString -> {
                     try {
                         JsonNode jsonNode = objectMapper.readTree(jsonString);
 
                         boolean statusOk = jsonNode.has("status") && "OK".equals(jsonNode.get("status").asText());
-                        boolean hasResults = jsonNode.has("results") && jsonNode.get("results").isArray() && !jsonNode.get("results").isEmpty();
+                        boolean hasResults = jsonNode.has("results") && jsonNode.get("results").isArray()
+                                && !jsonNode.get("results").isEmpty();
 
                         if (statusOk && hasResults) {
                             return jsonNode.get("results").get(0).get("formatted_address").asText();
                         }
-                        
+
                         String apiStatus = jsonNode.has("status") ? jsonNode.get("status").asText() : "UNKNOWN_ERROR";
                         return "Dirección no encontrada (Status Google: " + apiStatus + ")";
-                        
+
                     } catch (Exception e) {
                         System.err.println("🚨 Error al procesar el JSON de Google: " + e.getMessage());
                         return "Error al interpretar la dirección geográfica";
                     }
                 })
                 .doOnError(error -> System.err.println("🚨 ERROR CRÍTICO EN LA PETICIÓN: " + error.getMessage()))
-                // Devolvemos un texto seguro si la red llegara a caer para que no rompa el Mono.zip
+
                 .onErrorReturn("Servicio de mapas temporalmente no disponible");
     }
 }

@@ -4,4 +4,5 @@ import reactor.core.publisher.Mono;
 
 public interface ExpoNotification {
     public Mono<Void> sendPushNotification(String expoPushToken, String title, String body);
+    public Mono<Void> sendPushNotification(String expoPushToken, String title, String body, String bookingId, String technicalId);
 }

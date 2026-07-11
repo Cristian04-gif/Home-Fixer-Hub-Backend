@@ -3,6 +3,7 @@ package com.home_fixer_hub.profile_service.Domain.Service.Imp;
 import org.springframework.http.codec.multipart.FilePart;
 import org.springframework.stereotype.Service;
 
+import com.home_fixer_hub.profile_service.Domain.Client.BookingClient;
 import com.home_fixer_hub.profile_service.Domain.Client.CatalogClient;
 import com.home_fixer_hub.profile_service.Domain.Client.IdentityClient;
 import com.home_fixer_hub.profile_service.Domain.DTO.TechnicalDTO;
@@ -25,6 +26,7 @@ public class TechnicalServiceImp implements TechnicalService {
     private final IdentityClient identityClient;
     private final CatalogClient catalogClient;
     private final CloudinaryService cloudinaryService;
+    private final BookingClient bookingClient;
 
     @Override
     public Mono<TechnicalDTO> getbyId(String technicalid) {
@@ -84,15 +86,6 @@ public class TechnicalServiceImp implements TechnicalService {
                     technical.setDisponible(!technical.getDisponible());
                     return technicalRepository.save(technical);
                 }).map(technicalMapper::toDTO);
-        /*
-         * .flatMap(technical -> technicalRepository.updateAvailability(technicalId,
-         * !technical.getDisponible())
-         * .then(Mono.fromCallable(() -> {
-         * technical.setDisponible(!technical.getDisponible());
-         * return technical;
-         * })))
-         */
-
     }
 
     @Override
@@ -105,7 +98,7 @@ public class TechnicalServiceImp implements TechnicalService {
                 .switchIfEmpty(Mono.error(new RuntimeException("No se encontor el tecnico con el id: " + technicalId)));
     }
 
-    //////////////////////////
+    ///////////////////////
 
     @Override
     public Flux<TechnicalDTO> getAll() {
@@ -128,5 +121,18 @@ public class TechnicalServiceImp implements TechnicalService {
                     tech.setPushToken(pushToken);
                     return technicalRepository.save(tech);
                 }).then();
+    }
+
+    @Override
+    public Mono<Void> saveRating(String bookingId, String technicalId, Double promedio) {
+        return bookingClient.getJobById(bookingId)
+                .switchIfEmpty(Mono.error(new RuntimeException("NO se encontro el trabajo con el id: " + bookingId)))
+                .flatMap(book -> technicalRepository.findById(technicalId).switchIfEmpty(
+                        Mono.error(new RuntimeException("NO se encontro el tecnico con el id: " + technicalId))))
+                .flatMap(tech -> {
+                    tech.setValoracionPromedio(promedio);
+                    return technicalRepository.save(tech);
+                }).then();
+
     }
 }

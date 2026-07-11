@@ -8,7 +8,9 @@ import com.home_fixer_hub.booking_service.Domain.DTO.CustomerDTO;
 import com.home_fixer_hub.booking_service.Domain.DTO.TechnicalDTO;
 import com.home_fixer_hub.booking_service.Domain.Service.ExpoNotification;
 import com.home_fixer_hub.booking_service.Domain.Service.NotificationService;
+import com.home_fixer_hub.booking_service.Persistense.Model.Booking;
 import com.home_fixer_hub.booking_service.Persistense.Model.BookingStatus;
+import com.home_fixer_hub.booking_service.Persistense.Repository.BookingRepository;
 import com.home_fixer_hub.booking_service.Persistense.Utils.NotificationBody;
 
 import lombok.RequiredArgsConstructor;
@@ -21,6 +23,7 @@ public class NotificationServiceImp implements NotificationService {
     private final TechnicalClient technicalClient;
     private final CustomerClient customerClient;
     private final ExpoNotification expoNotification;
+    private final BookingRepository bookingRepository;
 
     @Override
     public Mono<Void> sendNotificationRequest(String customerId, String technicalId, String bookingStatus,
@@ -62,12 +65,6 @@ public class NotificationServiceImp implements NotificationService {
                 body = NotificationBody.BODY_REQUEST_PROCESS;
             }
             ;
-            if (bookingStatus.equals(BookingStatus.FINALIZADA.name())) {
-                pushTokenDestino = cliente.pushToken();
-                title = NotificationBody.TITLE_REQUEST_COMPLETED;
-                body = NotificationBody.BODY_REQUEST_COMPLETED;
-            }
-            ;
             if (bookingStatus.equals(BookingStatus.CANCELADO.name())) {
                 pushTokenDestino = cliente.pushToken();
                 title = NotificationBody.TITLE_REQUEST_CANCELLED;
@@ -76,6 +73,30 @@ public class NotificationServiceImp implements NotificationService {
             ;
 
             return expoNotification.sendPushNotification(pushTokenDestino, title, body);
+        });
+
+    }
+
+    @Override
+    public Mono<Void> sendNotificationRequestFinishBooking(String customerId, String technicalId,
+            String service, String bookingId) {
+        Mono<TechnicalDTO> techValidator = technicalClient.getTechnicalById(technicalId)
+                .switchIfEmpty(Mono.error(new RuntimeException("NO se encontro el tecnico " + technicalId)));
+        Mono<CustomerDTO> customerValidator = customerClient.getCustomerId(customerId)
+                .switchIfEmpty(Mono.error(new RuntimeException("NO se encontro el cliente " + customerId)));
+
+        Mono<Booking> bookingvalidator = bookingRepository.findById(bookingId)
+                .switchIfEmpty(Mono.error(new RuntimeException("No se encontro el servicio")));
+
+        return Mono.zip(techValidator, customerValidator, bookingvalidator).flatMap(tuple -> {
+            TechnicalDTO tech = tuple.getT1();
+            CustomerDTO cliente = tuple.getT2();
+
+            String pushTokenDestino = cliente.pushToken();
+            String title = NotificationBody.TITLE_REQUEST_COMPLETED;
+            String body = NotificationBody.BODY_REQUEST_COMPLETED;
+
+            return expoNotification.sendPushNotification(pushTokenDestino, title, body, bookingId, tech.id());
         });
 
     }

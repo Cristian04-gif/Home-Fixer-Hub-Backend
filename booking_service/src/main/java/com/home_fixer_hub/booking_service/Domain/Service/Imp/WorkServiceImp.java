@@ -53,6 +53,9 @@ public class WorkServiceImp implements WorkService {
         return bookingRepository.findById(bookingId)
                 .switchIfEmpty(Mono.error(new RuntimeException("No se encontro un trabajo con el id: " + bookingId)))
                 .flatMap(booking -> {
+                    if (!booking.getEstadoConsulta().equals(BookingStatus.ACEPTADA.name())) {
+                        return Mono.error(new RuntimeException("No puedes empezar con un trabajo que no aceptaste"));
+                    }
                     booking.setEstadoConsulta(BookingStatus.EN_PROCESO.name());
                     booking.setFechaModificacion(LocalDateTime.now());
                     return bookingRepository.save(booking);
@@ -60,7 +63,7 @@ public class WorkServiceImp implements WorkService {
                         book.getIdCliente(),
                         book.getIdTecnico(),
                         book.getEstadoConsulta(),
-                        book.getTipoServicio()).thenReturn(book)) 
+                        book.getTipoServicio()).thenReturn(book))
                 .map(bookingMapper::toDTO);
     }
 
@@ -69,11 +72,14 @@ public class WorkServiceImp implements WorkService {
         return bookingRepository.findById(bookingId)
                 .switchIfEmpty(Mono.error(new RuntimeException("No se encontro un trabajo con el id: " + bookingId)))
                 .flatMap(booking -> {
+                    if (!booking.getEstadoConsulta().equals(BookingStatus.EN_PROCESO.name())) {
+                        return Mono.error(new RuntimeException("No puedes finalizar con un trabajo que no iniciaste"));
+                    }
                     booking.setEstadoConsulta(BookingStatus.FINALIZADA.name());
                     booking.setFechaModificacion(LocalDateTime.now());
                     return bookingRepository.save(booking);
-                }).doOnNext(book -> notificationService.sendNotificationRequest(book.getIdCliente(),
-                        book.getIdTecnico(), book.getEstadoConsulta(), book.getTipoServicio()))
+                }).flatMap(book -> notificationService.sendNotificationRequestFinishBooking(book.getIdCliente(),
+                        book.getIdTecnico(), book.getTipoServicio(), book.getId()).thenReturn(book))
                 .map(bookingMapper::toDTO);
     }
 
@@ -82,11 +88,14 @@ public class WorkServiceImp implements WorkService {
         return bookingRepository.findById(bookingId)
                 .switchIfEmpty(Mono.error(new RuntimeException("No se encontro un trabajo con el id: " + bookingId)))
                 .flatMap(booking -> {
+                    if (!booking.getEstadoConsulta().equals(BookingStatus.FINALIZADA.name())) {
+                        return Mono.error(new RuntimeException("No puedes cancelar con un trabajo que ya se termino"));
+                    }
                     booking.setEstadoConsulta(BookingStatus.CANCELADO.name());
                     booking.setFechaModificacion(LocalDateTime.now());
                     return bookingRepository.save(booking);
-                }).doOnNext(book -> notificationService.sendNotificationRequest(book.getIdCliente(),
-                        book.getIdTecnico(), book.getEstadoConsulta(), book.getTipoServicio()))
+                }).flatMap(book -> notificationService.sendNotificationRequest(book.getIdCliente(),
+                        book.getIdTecnico(), book.getEstadoConsulta(), book.getTipoServicio()).thenReturn(book))
                 .map(bookingMapper::toDTO);
     }
 

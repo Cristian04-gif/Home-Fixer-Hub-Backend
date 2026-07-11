@@ -29,7 +29,6 @@ public class TechnicalServiceServiceImp implements TechnicalServiceService {
         private final ProfileClient profileClient;
 
         private final TypeServiceRepository serviceRepository;
-        // private final TypeServiceMapper serviceMapper;
 
         private final ImagesRepository imagesRepository;
 

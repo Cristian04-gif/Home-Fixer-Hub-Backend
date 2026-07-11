@@ -15,17 +15,16 @@ public class SecurityConfig {
     @Bean
     public SecurityWebFilterChain springSecurityFilterChain(ServerHttpSecurity http) {
         return http
-            .csrf(csrf -> csrf.disable()) // Deshabilitado para APIs con JWT
+            .csrf(csrf -> csrf.disable()) 
             .authorizeExchange(exchanges -> exchanges
                 .pathMatchers("/api/auth/**").permitAll()
                 .anyExchange().authenticated()
             )
-            //.addFilterAt(customJwtFilter, SecurityWebFiltersOrder.AUTHENTICATION) // Tu filtro de JWT
             .build();
     }
 
     @Bean
     public PasswordEncoder passwordEncoder() {
-        return new BCryptPasswordEncoder(); // El estándar de la industria
+        return new BCryptPasswordEncoder(); 
     }
 }

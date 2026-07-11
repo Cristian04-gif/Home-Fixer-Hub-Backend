@@ -35,6 +35,9 @@ public class ApiGatewayApplication {
 				.route("booking-service", r -> r.path("/api/bookings/**")
 						.filters(f -> f.filter(authenticationFilter.apply(new AuthenticationFilter.Config())))
 						.uri("lb://BOOKING-SERVICE"))
+				.route("review-service", r -> r.path("/api/reviews/**")
+						.filters(f -> f.filter(authenticationFilter.apply(new AuthenticationFilter.Config())))
+						.uri("lb://REVIEW-SERVICE"))
 				.build();
 	}
 

@@ -24,10 +24,12 @@ public interface TechnicalService {
     public Mono<Void> deleteById(String technicalId);
 
     public Mono<Void> updatePushToken(String technicalId, String pushToken);
-    
+
+    public Mono<Void> saveRating(String bookingId, String technicalId, Double promedio);
+
     ///////////////////////////////////
     /// 
-    
+
     public Flux<TechnicalDTO> getAll();
 
     public Flux<TechnicalDTO> getAllAvailable();

@@ -5,6 +5,7 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.codec.multipart.FilePart;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.home_fixer_hub.profile_service.Domain.DTO.TechnicalDTO;
@@ -89,10 +90,17 @@ public class TechnicalController {
         return technicalService.deleteById(technicalId).map(vales -> ResponseEntity.noContent().build());
     }
 
+    @PutMapping("/saveRating/{technicalId}")
+    public Mono<ResponseEntity<Void>> saveRating(@PathVariable String technicalId, @RequestParam String bookingId,
+            @RequestParam Double promedio) {
+        return technicalService.saveRating(bookingId, technicalId, promedio)
+                .map(value -> ResponseEntity.noContent().build());
+    }
+
     // tecnicos cercanos
     // top tecnicos
 
-    ///////////////////////////
+    //////////////////////////
 
     @GetMapping("")
     public Flux<TechnicalDTO> getAll() {

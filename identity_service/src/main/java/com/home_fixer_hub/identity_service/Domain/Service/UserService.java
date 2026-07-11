@@ -13,5 +13,4 @@ public interface UserService {
     public Mono<AuthResponse> login(AuthRequest authRequest);
     public Mono<AuthResponse> refreshToken(String token);
     public Mono<Boolean> validateUser(String userId);
-    //public Mono<Void> delete(String userId);
 }

@@ -62,8 +62,9 @@ public class BookingServiceImp implements BookingService {
                                         booking.setFechaModificacion(LocalDateTime.now());
                                         return bookingRepository.save(booking);
                                 })
-                                .doOnNext(book -> notificationService.sendNotificationRequest(book.getIdCliente(),
-                                                book.getIdTecnico(), book.getEstadoConsulta(), book.getTipoServicio()))
+                                .flatMap(book -> notificationService.sendNotificationRequest(book.getIdCliente(),
+                                                book.getIdTecnico(), book.getEstadoConsulta(), book.getTipoServicio())
+                                                .thenReturn(book))
                                 .map(bookingMapper::toDTO);
         }
 
@@ -130,12 +131,17 @@ public class BookingServiceImp implements BookingService {
                                                                 "No se encontro la solicitud de servicios con el id: "
                                                                                 + bookingId)))
                                 .flatMap(booking -> {
-
+                                        if (!booking.getEstadoConsulta().equals(BookingStatus.PENDIENTE.name())) {
+                                                return Mono.error(new RuntimeException(
+                                                                "No puedes aceptar un trabajo que esta en espera"));
+                                        }
                                         booking.setEstadoConsulta(BookingStatus.ACEPTADA.name());
                                         booking.setFechaModificacion(LocalDateTime.now());
                                         return bookingRepository.save(booking);
-                                }).doOnNext(book -> notificationService.sendNotificationRequest(book.getIdCliente(),
-                                                book.getIdTecnico(), book.getEstadoConsulta(), book.getTipoServicio())).map(bookingMapper::toDTO);
+                                }).flatMap(book -> notificationService.sendNotificationRequest(book.getIdCliente(),
+                                                book.getIdTecnico(), book.getEstadoConsulta(), book.getTipoServicio())
+                                                .thenReturn(book))
+                                .map(bookingMapper::toDTO);
         }
 
         @Override
@@ -146,11 +152,16 @@ public class BookingServiceImp implements BookingService {
                                                                 "No se encontro la solicitud de servicios con el id: "
                                                                                 + bookingId)))
                                 .flatMap(booking -> {
+                                        if (!booking.getEstadoConsulta().equals(BookingStatus.PENDIENTE.name())) {
+                                                return Mono.error(new RuntimeException(
+                                                                "No puedes rechazar un trabajo que no esta en espera"));
+                                        }
                                         booking.setEstadoConsulta(BookingStatus.RECHAZADA.name());
                                         booking.setFechaModificacion(LocalDateTime.now());
                                         return bookingRepository.save(booking);
-                                }).doOnNext(book -> notificationService.sendNotificationRequest(book.getIdCliente(),
-                                                book.getIdTecnico(), book.getEstadoConsulta(), book.getTipoServicio())).then();
+                                }).flatMap(book -> notificationService.sendNotificationRequest(book.getIdCliente(),
+                                                book.getIdTecnico(), book.getEstadoConsulta(), book.getTipoServicio()))
+                                .then();
         }
 
         @Override
@@ -161,11 +172,16 @@ public class BookingServiceImp implements BookingService {
                                                                 "No se encontro la solicitud de servicios con el id: "
                                                                                 + bookingId)))
                                 .flatMap(booking -> {
+                                        if (!booking.getEstadoConsulta().equals(BookingStatus.FINALIZADA.name())) {
+                                                return Mono.error(new RuntimeException(
+                                                                "No puedes cancelar con un trabajo que ya se termino"));
+                                        }
                                         booking.setEstadoConsulta(BookingStatus.CANCELADO.name());
                                         booking.setFechaModificacion(LocalDateTime.now());
                                         return bookingRepository.save(booking);
-                                }).doOnNext(book -> notificationService.sendNotificationRequest(book.getIdCliente(),
-                                                book.getIdTecnico(), book.getEstadoConsulta(), book.getTipoServicio())).then();
+                                }).flatMap(book -> notificationService.sendNotificationRequest(book.getIdCliente(),
+                                                book.getIdTecnico(), book.getEstadoConsulta(), book.getTipoServicio()))
+                                .then();
         }
 
 }

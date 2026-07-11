@@ -69,7 +69,7 @@ public class BookingController {
         return bookingService.rejectQuery(bookingId);
     }
 
-    @PutMapping("/{bookingId}/reject")
+    @PutMapping("/{bookingId}/cancel")
     public Mono<Void> cancelQuery(@PathVariable String bookingId) {
         return bookingService.cancelQuery(bookingId);
     }
