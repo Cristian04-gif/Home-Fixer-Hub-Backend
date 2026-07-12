@@ -21,12 +21,21 @@ spring:
 eureka:
   client:
     service-url:
-      defaultZone: http://${EUREKA_HOST:localhost}:${EUREKA_PORT:8761}/eureka/ 
+      defaultZone: http://${EUREKA_HOST:localhost}:${EUREKA_PORT:8761}/eureka/
+    register-with-eureka: ${EUREKA_ENABLED:true}
+    fetch-registry: ${EUREKA_ENABLED:true}
+  instance:
+      prefer-ip-address: true
+
+cloudinary:
+  cloud_name: ${CLOUDINARY_NAME:dep5zhuay}
+  api_key: ${CLOUDINARY_API_KEY:613478824826563}
+  api_secret: ${CLOUDINARY_API_SECRET:TnM60owVajuJDqAInSYvD_3u7_Y}
 
 services:
   identity-service:
-    url: http://IDENTITY-SERVICE
+    url: ${IDENTITY_SERVICE_URL:http://IDENTITY-SERVICE}
   catalog-service:
-    uri: http://CATALOG-SERVICE
+    uri: ${CATALOG_SERVICE_URL:http://CATALOG-SERVICE}
   booking-service:
-    url: http://BOOKING-SERVICE
+    url: ${BOOKING_SERVICE_URL:http://BOOKING-SERVICE}

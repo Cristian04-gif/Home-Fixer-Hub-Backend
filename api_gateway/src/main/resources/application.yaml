@@ -1,13 +1,21 @@
 spring:
-    application:
-        name: api-gateway
+  application:
+    name: api-gateway
 server:
-    port: 8080
+  port: 8080
 
 eureka:
-    client:
-        service-url:
-            defaultZone: http://localhost:8761/eureka/
-        register-with-eureka: true
-        fetch-registry: true
+  client:
+    service-url:
+      defaultZone: http://localhost:8761/eureka/
+    register-with-eureka: ${EUREKA_ENABLED:true}
+    fetch-registry: ${EUREKA_ENABLED:true}
+  instance:
+    prefer-ip-address: true
 
+services:
+  identiy-service: ${IDENTITY_SERVICE_URL:lb://IDENTITY-SERVICE}
+  profile-service: ${PROFILE_SERVICE_URL:lb://PROFILE-SERVICE}
+  catalog-service: ${CATALOG_SERVICE_URL:lb://CATALOG-SERVICE}
+  booking-service: ${BOOKING_SERVICE_URL:lb://BOOKING-SERVICE}
+  review-service: ${REVIEW_SERVICE_URL:lb://REVIEW-SERVICE}

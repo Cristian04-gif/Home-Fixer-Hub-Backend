@@ -7,8 +7,8 @@ spring:
   #Configuración de R2DBC para MySQL
   r2dbc:
     url: r2dbc:mysql://${DB_HOST:localhost}:${DB_PORT:3306}/${DB_NAME:ms_booking}
-    username: root
-    password: root
+    username: ${DB_USERNAME:root}
+    password: ${DB_PASSWORD:root}
     pool:
       enabled: true
       initial-size: 5
@@ -30,11 +30,15 @@ eureka:
   client:
     service-url:
       defaultZone: http://${EUREKA_HOST:localhost}:${EUREKA_PORT:8761}/eureka/ # Aquí le avisa a Eureka que existe
+    register-with-eureka: ${EUREKA_ENABLED:true}
+    fetch-registry: ${EUREKA_ENABLED:true}
+  instance:
+      prefer-ip-address: true
 
 google:
   maps:
-    api-key: "AIzaSyCQl6FfHCVwHcZbjaifXaa8mQKAJ1ZARss"
+    api-key: ${API_KEY_GOOGLE_MAPS:AIzaSyCQl6FfHCVwHcZbjaifXaa8mQKAJ1ZARss}
 
 services:
   profile-service:
-    url: http://PROFILE-SERVICE
+    url: ${PROFILE_SERVICE_URL:http://PROFILE-SERVICE}

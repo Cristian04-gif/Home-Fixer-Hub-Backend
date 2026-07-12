@@ -1,6 +1,7 @@
 package com.home_fixer_hub.api_gateway;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.cloud.client.discovery.EnableDiscoveryClient;
@@ -17,6 +18,17 @@ public class ApiGatewayApplication {
 	@Autowired
 	private AuthenticationFilter authenticationFilter;
 
+	@Value("${services.identiy-service}")
+	private String identityService;
+	@Value("${services.profile-service}")
+	private String profileService;
+	@Value("${services.catalog-service}")
+	private String catalogService;
+	@Value("${services.booking-service}")
+	private String bookingService;
+	@Value("${services.review-service}")
+	private String reviewService;
+
 	public static void main(String[] args) {
 		SpringApplication.run(ApiGatewayApplication.class, args);
 	}
@@ -25,19 +37,19 @@ public class ApiGatewayApplication {
 	public RouteLocator customRouteLocator(RouteLocatorBuilder builder) {
 		return builder.routes()
 				.route("identity-route", r -> r.path("/api/auth/**")
-						.uri("lb://IDENTITY-SERVICE"))
+						.uri(identityService))
 				.route("profile-service", r -> r.path("/api/profile/**")
 						.filters(f -> f.filter(authenticationFilter.apply(new AuthenticationFilter.Config())))
-						.uri("lb://PROFILE-SERVICE"))
+						.uri(profileService))
 				.route("catalog-service", r -> r.path("/api/catalog/**")
 						.filters(f -> f.filter(authenticationFilter.apply(new AuthenticationFilter.Config())))
-						.uri("lb://CATALOG-SERVICE"))
+						.uri(catalogService))
 				.route("booking-service", r -> r.path("/api/bookings/**")
 						.filters(f -> f.filter(authenticationFilter.apply(new AuthenticationFilter.Config())))
-						.uri("lb://BOOKING-SERVICE"))
+						.uri(bookingService))
 				.route("review-service", r -> r.path("/api/reviews/**")
 						.filters(f -> f.filter(authenticationFilter.apply(new AuthenticationFilter.Config())))
-						.uri("lb://REVIEW-SERVICE"))
+						.uri(reviewService))
 				.build();
 	}
 
