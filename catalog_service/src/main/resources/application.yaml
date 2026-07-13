@@ -29,10 +29,11 @@ eureka:
   client:
     service-url:
       defaultZone: http://${EUREKA_HOST:localhost}:${EUREKA_PORT:8761}/eureka/ # Aquí le avisa a Eureka que existe
+    enabled: ${EUREKA_ENABLED:true}
     register-with-eureka: ${EUREKA_ENABLED:true}
     fetch-registry: ${EUREKA_ENABLED:true}
   instance:
-      prefer-ip-address: true
+    prefer-ip-address: true
 
 cloudinary:
   cloud_name: ${CLOUDINARY_NAME}

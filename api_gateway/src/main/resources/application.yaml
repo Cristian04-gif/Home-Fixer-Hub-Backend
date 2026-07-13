@@ -8,6 +8,7 @@ eureka:
   client:
     service-url:
       defaultZone: http://localhost:8761/eureka/
+    enabled: ${EUREKA_ENABLED:true}
     register-with-eureka: ${EUREKA_ENABLED:true}
     fetch-registry: ${EUREKA_ENABLED:true}
   instance:
