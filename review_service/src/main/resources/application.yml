@@ -38,6 +38,6 @@ eureka:
 
 services:
   profile-service:
-    url: ${PROFILE_SERVICE_URL:http://PROFILE-SERVICE}
+    url: ${PROFILE_SERVICE_URL:http://localhost:8082}
   booking-service:
-    url: ${BOOKING_SERVICE_URL:http://BOOKING-SERVICE}
+    url: ${BOOKING_SERVICE_URL:http://localhost:8084}
