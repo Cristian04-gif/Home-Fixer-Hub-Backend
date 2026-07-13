@@ -1,5 +1,5 @@
 server:
-  port: 8084
+  port: ${PORT:8084}
 
 spring:
   application:
@@ -37,7 +37,7 @@ eureka:
 
 google:
   maps:
-    api-key: ${API_KEY_GOOGLE_MAPS:AIzaSyCQl6FfHCVwHcZbjaifXaa8mQKAJ1ZARss}
+    api-key: ${API_KEY_GOOGLE_MAPS}
 
 services:
   profile-service:
