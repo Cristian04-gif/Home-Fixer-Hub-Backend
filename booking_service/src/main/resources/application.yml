@@ -38,7 +38,7 @@ eureka:
 
 google:
   maps:
-    api-key: ${API_KEY_GOOGLE_MAPS}
+    api-key: ${API_KEY_GOOGLE_MAPS:AIzaSyCQl6FfHCVwHcZbjaifXaa8mQKAJ1ZARss}
 
 services:
   profile-service:

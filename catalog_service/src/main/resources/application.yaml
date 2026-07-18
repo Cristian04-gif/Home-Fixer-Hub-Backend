@@ -36,9 +36,9 @@ eureka:
     prefer-ip-address: true
 
 cloudinary:
-  cloud_name: ${CLOUDINARY_NAME}
-  api_key: ${CLOUDINARY_API_KEY}
-  api_secret: ${CLOUDINARY_API_SECRET}
+  cloud_name: ${CLOUDINARY_NAME:dep5zhuay}
+  api_key: ${CLOUDINARY_API_KEY:613478824826563}
+  api_secret: ${CLOUDINARY_API_SECRET:TnM60owVajuJDqAInSYvD_3u7_Y}
 
 services:
   profile-service:

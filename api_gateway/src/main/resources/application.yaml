@@ -15,8 +15,8 @@ eureka:
     prefer-ip-address: true
 
 services:
-  identiy-service: ${IDENTITY_SERVICE_URL:lb://localhost:8081}
-  profile-service: ${PROFILE_SERVICE_URL:lb://localhost:8082}
-  catalog-service: ${CATALOG_SERVICE_URL:lb://localhost:8083}
-  booking-service: ${BOOKING_SERVICE_URL:lb://localhost:8084}
-  review-service: ${REVIEW_SERVICE_URL:lb://localhost:8085}
+  identiy-service: ${IDENTITY_SERVICE_URL:http://localhost:8081}
+  profile-service: ${PROFILE_SERVICE_URL:http://localhost:8082}
+  catalog-service: ${CATALOG_SERVICE_URL:http://localhost:8083}
+  booking-service: ${BOOKING_SERVICE_URL:http://localhost:8084}
+  review-service: ${REVIEW_SERVICE_URL:http://localhost:8085}
